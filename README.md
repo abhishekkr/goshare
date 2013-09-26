@@ -3,7 +3,13 @@
 #### Go Share any data among the nodes. Over HTTP (0MQ to come).
 
 Tryout:
-``` go_clr gohttp.go -dbpath=/tmp/GOTSDB ```
+```Shell
+ go run gohttp.go -dbpath=/tmp/GOTSDB
+```
+By default it runs at port 9797, make it run on another port using
+```Shell
+ go run gohttp.go -dbpath=/tmp/GOTSDB -port=8080
+```
 
 Now visit the the link asked by it and get the help page.
 
