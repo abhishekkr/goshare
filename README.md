@@ -24,5 +24,6 @@ Now visit the the link asked by it and get the help page.
 ```
 
 ##### Dependency
-* go lang (obviously, the heart and soul of the app)
-* leveldb (we are using for datastore, it's awesome)
+* [go lang](http://golang.org/doc/install) (obviously, the heart and soul of the app)
+* [leveldb](http://en.wikipedia.org/wiki/LevelDB) (we are using for datastore, it's awesome)
+* [levigo](https://github.com/jmhodges/levigo/blob/master/README.md) (the go library utilized to access leveldb)
