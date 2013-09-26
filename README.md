@@ -14,6 +14,7 @@ By default it runs at port 9797, make it run on another port using
 Now visit the the link asked by it and get the help page.
 
 ```ASCII
+                        __
    ____ _____     _____/ /_  ____ _________
   / __ `/ __ \   / ___/ __ \/ __ `/ ___/ _ \
  / /_/ / /_/ /  (__  ) / / / /_/ / /  /  __/
@@ -21,3 +22,7 @@ Now visit the the link asked by it and get the help page.
 /____/
 
 ```
+
+##### Dependency
+* go lang (obviously, the heart and soul of the app)
+* leveldb (we are using for datastore, it's awesome)
