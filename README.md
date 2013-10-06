@@ -10,7 +10,9 @@
 
 ```
 
-#### Go Share any data among the nodes. Over HTTP (0MQ to come).
+#### Go Share any data among the nodes. Over HTTP or ZeroMQ.
+##### GOShare eases up communication over HTTP GET param based interaction.
+##### OR ZeroMQ REQ/REP based synchronous communication model.
 
 Tryout:
 
