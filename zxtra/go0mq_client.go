@@ -4,7 +4,7 @@ import (
   "fmt"
   "flag"
 
-  "./zeromq"
+  "../zeromq"
 )
 
 var (
@@ -13,7 +13,8 @@ var (
 )
 
 func main(){
-  fmt.Println("client ZeroMQ REP/REQ...")
+  flag.Parse()
+  fmt.Printf("client ZeroMQ REP/REQ... at %d, %d", req_port, rep_port)
 
   abkzeromq.ZmqReq(*req_port, *rep_port, "myname", "anon")
   abkzeromq.ZmqReq(*req_port, *rep_port, "myname")
