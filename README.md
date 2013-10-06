@@ -3,12 +3,45 @@
 #### Go Share any data among the nodes. Over HTTP (0MQ to come).
 
 Tryout:
+
+#### Over HTTP
+
 ```Shell
  go run gohttp.go -dbpath=/tmp/GOTSDB
 ```
 By default it runs at port 9797, make it run on another port using
 ```Shell
  go run gohttp.go -dbpath=/tmp/GOTSDB -port=8080
+```
+
+```ASCII
+  Dummy Client Using It
+
+  * go run zxtra/gohttp_client.go
+
+  for custom Port: 8080
+
+  * go run zxtra/gohttp_client.go -port=8080
+```
+
+#### Over ZeroMQ
+
+```Shell
+ go run go0mq.go -dbpath=/tmp/GOTSDB
+```
+By default Binds at Ports: 9797, 9898, to opt for ports of choice 8000, 8080
+```Shell
+ go run go0mq.go -dbpath=/tmp/GOTSDB -req-port=8000 -rep-port=8080
+```
+
+```ASCII
+  Dummy Client Using It
+
+  * go run zxtra/go0mq_client.go
+
+  for custom Port: 8080
+
+  * go run zxtra/go0mq_client.go -req-port=8000 -rep-port=8080
 ```
 
 Now visit the the link asked by it and get the help page.
@@ -27,3 +60,4 @@ Now visit the the link asked by it and get the help page.
 * [go lang](http://golang.org/doc/install) (obviously, the heart and soul of the app)
 * [leveldb](http://en.wikipedia.org/wiki/LevelDB) (we are using for datastore, it's awesome)
 * [levigo](https://github.com/jmhodges/levigo/blob/master/README.md) (the go library utilized to access leveldb)
+* [zeroMQ]() (the supercharged Sockets giving REQuest/REPly power)
