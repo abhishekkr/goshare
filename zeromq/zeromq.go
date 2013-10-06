@@ -18,7 +18,7 @@ func ZmqRep(req_port int, rep_port int, read READ, push PUSH) {
   fmt.Printf("ZMQ REQ/REP Daemon at port %d and %d\n", req_port, rep_port)
   for {
     msg, _ := socket.Recv(0)
-    fmt.Println("Got: %s", string(msg))
+    fmt.Println("Got:", string(msg))
     msg_arr := strings.Fields(string(msg))
     if len(msg_arr) == 1 {
       read(msg_arr[0])
