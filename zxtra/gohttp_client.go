@@ -9,7 +9,7 @@ import (
 
 var (
   httphost   = flag.String("host", "127.0.0.1", "what Host to run at")
-  httpport   = flag.Int("port", 9797, "what Socket PORT to connect")
+  httpport   = flag.Int("port", 9999, "what Socket PORT to connect")
 )
 
 func GetURL(host string, port int, key string) string{
