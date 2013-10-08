@@ -11,25 +11,13 @@
 ```
 
 #### Go Share any data among the nodes. Over HTTP or ZeroMQ.
-##### GOShare eases up communication over HTTP GET param based interaction.
-##### OR ZeroMQ REQ/REP based synchronous communication model.
 
-***
+* GOShare eases up communication over HTTP GET param based interaction.
+* ZeroMQ REQ/REP based synchronous communication model.
 
-#### Structure:
+it's "go get"-able
 
-> "goshare"'s methods to adapt these in your code:
->
-> * GoShare() : it runs HTTP and ZeroMQ daemon in parallel goroutines
-> > has optional flags customization of:
-> > * dbpath: path for LevelDB (default: /tmp/GO.DB)
-> > * port: port to bind HTTP daemon (default: 9999)
-> > * req-port, rep-port: ports to bind ZeroMQ REQ/REP daemon (default: 9797, 9898)
->
-> * GoShareHTTP(<levigo DB handle>, <http port as int>) : it runs HTTP daemon
->
-> * GoShareZMQ(<levigo DB handle>, <req-port as int>, <rep-port as int>) : it runs ZMQ daemon
->
+``` go get "github.com/abhishekkr/goshare" ```
 
 ***
 
@@ -60,6 +48,23 @@ make it run on another port using following required flags
 
   * go run zxtra/go0mq_client.go -req-port=8000 -rep-port=8001
 ```
+
+***
+
+#### Structure:
+
+> "goshare"'s methods to adapt these in your code:
+>
+> * GoShare() : it runs HTTP and ZeroMQ daemon in parallel goroutines
+> > has optional flags customization of:
+> > * dbpath: path for LevelDB (default: /tmp/GO.DB)
+> > * port: port to bind HTTP daemon (default: 9999)
+> > * req-port, rep-port: ports to bind ZeroMQ REQ/REP daemon (default: 9797, 9898)
+>
+> * GoShareHTTP(&lt;levigo DB handle&gt;, &lt;http port as int&gt;) : it runs HTTP daemon
+>
+> * GoShareZMQ(&lt;levigo DB handle&gt;, &lt;req-port as int&gt;, &lt;rep-port as int&gt;) : it runs ZMQ daemon
+>
 
 ***
 
