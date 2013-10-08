@@ -1,25 +1,15 @@
-package main
+package goshare
 
 import (
   "fmt"
-  "flag"
-  "log"
   "net/http"
   "html/template"
-  "os"
   "runtime"
-  "runtime/pprof"
   "time"
 
   "github.com/jmhodges/levigo"
-  "./leveldb"
-)
 
-var (
-  db *levigo.DB
-  dbpath     = flag.String("dbpath", "/tmp/GO.DB", "the path to DB")
-  httpport   = flag.Int("port", 9797, "what Socket PORT to run at")
-  cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
+  "github.com/abhishekkr/goshare/leveldb"
 )
 
 func HomePage(w http.ResponseWriter, req *http.Request) {
@@ -29,7 +19,7 @@ func HomePage(w http.ResponseWriter, req *http.Request) {
   t.Execute(w, nil)
 }
 
-func ReadKey(w http.ResponseWriter, req *http.Request) {
+func GetReadKey(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
 
   req.ParseForm()
@@ -37,7 +27,7 @@ func ReadKey(w http.ResponseWriter, req *http.Request) {
   w.Write([]byte(val))
 }
 
-func PushKey(w http.ResponseWriter, req *http.Request) {
+func GetPushKey(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
 
   req.ParseForm()
@@ -48,33 +38,20 @@ func PushKey(w http.ResponseWriter, req *http.Request) {
   w.Write([]byte("Success"))
 }
 
-func main() {
+func GoShareHTTP(leveldb *levigo.DB, httpport int) {
+  db = leveldb
   runtime.GOMAXPROCS(runtime.NumCPU())
 
-  flag.Parse()
-  db = abkleveldb.CreateDB(*dbpath)
-  if *cpuprofile != "" {
-    f, err := os.Create(*cpuprofile)
-    if err != nil {
-      log.Fatal(err)
-    }
-    pprof.StartCPUProfile(f)
-    go func() {
-      time.Sleep(100 * time.Second)
-      pprof.StopCPUProfile()
-    }()
-  }
-
   http.HandleFunc("/", HomePage)
-  http.HandleFunc("/get", ReadKey)
-  http.HandleFunc("/put", PushKey)
+  http.HandleFunc("/get", GetReadKey)
+  http.HandleFunc("/put", GetPushKey)
 
   srv := &http.Server{
-    Addr:        fmt.Sprintf(":%d", *httpport),
+    Addr:        fmt.Sprintf(":%d", httpport),
     Handler:     http.DefaultServeMux,
     ReadTimeout: time.Duration(5) * time.Second,
   }
-  fmt.Printf("access your goshare at http://<IP>:%d\n", *httpport)
-  srv.ListenAndServe()
 
+  fmt.Printf("access your goshare at http://<IP>:%d\n", httpport)
+  srv.ListenAndServe()
 }
