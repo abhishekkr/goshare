@@ -43,45 +43,65 @@
 <h4>
 <a name="go-share-any-data-among-the-nodes-over-http-or-zeromq" class="anchor" href="#go-share-any-data-among-the-nodes-over-http-or-zeromq"><span class="octicon octicon-link"></span></a>Go Share any data among the nodes. Over HTTP or ZeroMQ.</h4>
 
-<p>Tryout:</p>
+<ul>
+<li>GOShare eases up communication over HTTP GET param based interaction.</li>
+<li>ZeroMQ REQ/REP based synchronous communication model.</li>
+</ul><p>it's "go get"-able</p>
 
-<h4>
-<a name="over-http" class="anchor" href="#over-http"><span class="octicon octicon-link"></span></a>Over HTTP</h4>
+<p><code>go get "github.com/abhishekkr/goshare"</code></p>
 
-<pre lang="Shell"><code> go run gohttp.go -dbpath=/tmp/GOTSDB
+<hr><h4>
+<a name="tryout" class="anchor" href="#tryout"><span class="octicon octicon-link"></span></a>Tryout:</h4>
+
+<pre lang="Shell"><code> go run zxtra/goshare_daemon.go -dbpath=/tmp/GOTSDB
 </code></pre>
 
-<p>By default it runs at port 9797, make it run on another port using</p>
+<p>By default it runs HTTP daemon at port 9999 and ZeroMQ daemon at 9797/9898,
+make it run on another port using following required flags</p>
 
-<pre lang="Shell"><code> go run gohttp.go -dbpath=/tmp/GOTSDB -port=8080
+<pre lang="Shell"><code> go run zxtra/goshare_daemon.go -dbpath=/tmp/GOTSDB -port=8080 -req-port=8000 -rep-port=8001
 </code></pre>
 
-<pre lang="ASCII"><code>  Dummy Client Using It
+<pre lang="ASCII"><code>  Dummy Clients Using It
+
   * go run zxtra/gohttp_client.go
 
-  for custom Port: 8080
-  * go run zxtra/gohttp_client.go -port=8080
-</code></pre>
-
-<h4>
-<a name="over-zeromq" class="anchor" href="#over-zeromq"><span class="octicon octicon-link"></span></a>Over ZeroMQ</h4>
-
-<pre lang="Shell"><code> go run go0mq.go -dbpath=/tmp/GOTSDB
-</code></pre>
-
-<p>By default Binds at Ports: 9797, 9898, to opt for ports of choice 8000, 8080</p>
-
-<pre lang="Shell"><code> go run go0mq.go -dbpath=/tmp/GOTSDB -req-port=8000 -rep-port=8080
-</code></pre>
-
-<pre lang="ASCII"><code>  Dummy Client Using It
   * go run zxtra/go0mq_client.go
 
-  for custom Port: 8080
-  * go run zxtra/go0mq_client.go -req-port=8000 -rep-port=8080
+
+  for custom Port: 8080 for HTTP; Port: 8000/8001 for ZeroMQ
+
+  * go run zxtra/gohttp_client.go -port=8080
+
+  * go run zxtra/go0mq_client.go -req-port=8000 -rep-port=8001
 </code></pre>
 
-<p>Now visit the the link asked by it and get the help page.</p>
+<hr><h4>
+<a name="structure" class="anchor" href="#structure"><span class="octicon octicon-link"></span></a>Structure:</h4>
+
+<blockquote>
+<p>"goshare"'s methods to adapt these in your code:</p>
+
+<ul>
+<li>
+<p>GoShare() : it runs HTTP and ZeroMQ daemon in parallel goroutines</p>
+
+<blockquote>
+<p>has optional flags customization of:</p>
+
+<ul>
+<li>dbpath: path for LevelDB (default: /tmp/GO.DB)</li>
+<li>port: port to bind HTTP daemon (default: 9999)</li>
+<li>req-port, rep-port: ports to bind ZeroMQ REQ/REP daemon (default: 9797, 9898)</li>
+</ul>
+</blockquote>
+</li>
+<li><p>GoShareHTTP(&lt;levigo DB handle&gt;, &lt;http port as int&gt;) : it runs HTTP daemon</p></li>
+<li><p>GoShareZMQ(&lt;levigo DB handle&gt;, &lt;req-port as int&gt;, &lt;rep-port as int&gt;) : it runs ZMQ daemon</p></li>
+</ul>
+</blockquote>
+
+<hr><p>Now visit the the link asked by it and get the help page.</p>
 
 <h5>
 <a name="dependency" class="anchor" href="#dependency"><span class="octicon octicon-link"></span></a>Dependency</h5>
