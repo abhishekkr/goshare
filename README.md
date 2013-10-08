@@ -14,47 +14,54 @@
 ##### GOShare eases up communication over HTTP GET param based interaction.
 ##### OR ZeroMQ REQ/REP based synchronous communication model.
 
-Tryout:
+***
 
-#### Over HTTP
+#### Structure:
+
+> "goshare"'s methods to adapt these in your code:
+>
+> * GoShare() : it runs HTTP and ZeroMQ daemon in parallel goroutines
+> > has optional flags customization of:
+> > * dbpath: path for LevelDB (default: /tmp/GO.DB)
+> > * port: port to bind HTTP daemon (default: 9999)
+> > * req-port, rep-port: ports to bind ZeroMQ REQ/REP daemon (default: 9797, 9898)
+>
+> * GoShareHTTP(<levigo DB handle>, <http port as int>) : it runs HTTP daemon
+>
+> * GoShareZMQ(<levigo DB handle>, <req-port as int>, <rep-port as int>) : it runs ZMQ daemon
+>
+
+***
+
+#### Tryout:
 
 ```Shell
- go run gohttp.go -dbpath=/tmp/GOTSDB
+ go run zxtra/goshare_daemon.go -dbpath=/tmp/GOTSDB
 ```
-By default it runs at port 9797, make it run on another port using
+
+By default it runs HTTP daemon at port 9999 and ZeroMQ daemon at 9797/9898,
+make it run on another port using following required flags
+
 ```Shell
- go run gohttp.go -dbpath=/tmp/GOTSDB -port=8080
+ go run zxtra/goshare_daemon.go -dbpath=/tmp/GOTSDB -port=8080 -req-port=8000 -rep-port=8001
 ```
 
 ```ASCII
-  Dummy Client Using It
+  Dummy Clients Using It
 
   * go run zxtra/gohttp_client.go
 
-  for custom Port: 8080
-
-  * go run zxtra/gohttp_client.go -port=8080
-```
-
-#### Over ZeroMQ
-
-```Shell
- go run go0mq.go -dbpath=/tmp/GOTSDB
-```
-By default Binds at Ports: 9797, 9898, to opt for ports of choice 8000, 8080
-```Shell
- go run go0mq.go -dbpath=/tmp/GOTSDB -req-port=8000 -rep-port=8080
-```
-
-```ASCII
-  Dummy Client Using It
-
   * go run zxtra/go0mq_client.go
 
-  for custom Port: 8080
 
-  * go run zxtra/go0mq_client.go -req-port=8000 -rep-port=8080
+  for custom Port: 8080 for HTTP; Port: 8000/8001 for ZeroMQ
+
+  * go run zxtra/gohttp_client.go -port=8080
+
+  * go run zxtra/go0mq_client.go -req-port=8000 -rep-port=8001
 ```
+
+***
 
 Now visit the the link asked by it and get the help page.
 
