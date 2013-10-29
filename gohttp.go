@@ -16,7 +16,7 @@ func GetReadKey(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
 
   req.ParseForm()
-  val := abkleveldb.GetValues(req.Form["key"][0], db)
+  val := abkleveldb.GetKey(req.Form["key"][0], db)
   w.Write([]byte(val))
 }
 

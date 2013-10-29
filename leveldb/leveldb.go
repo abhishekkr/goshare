@@ -38,7 +38,7 @@ func PushKeyVal(key string, val string, db *levigo.DB) bool{
 
 
 /* Get Key */
-func GetValues(key string, db *levigo.DB) string {
+func GetKey(key string, db *levigo.DB) string {
   reader := levigo.NewReadOptions()
   defer reader.Close()
 

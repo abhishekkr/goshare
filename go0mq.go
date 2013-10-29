@@ -11,7 +11,7 @@ import (
 )
 
 func ReadKey(key string) string{
-  return abkleveldb.GetValues(key, db)
+  return abkleveldb.GetKey(key, db)
 }
 
 func PushKey(key string, val string) bool{
