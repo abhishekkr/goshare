@@ -3,21 +3,14 @@ package goshare
 import (
   "fmt"
   "net/http"
-  "html/template"
   "runtime"
   "time"
 
   "github.com/jmhodges/levigo"
 
   "github.com/abhishekkr/goshare/leveldb"
+  "github.com/abhishekkr/goshare/httpd"
 )
-
-func HomePage(w http.ResponseWriter, req *http.Request) {
-  w.Header().Set("Content-Type", "text/html")
-
-  t, _ := template.ParseFiles("public/index.html")
-  t.Execute(w, nil)
-}
 
 func GetReadKey(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
@@ -42,7 +35,11 @@ func GoShareHTTP(leveldb *levigo.DB, httpport int) {
   db = leveldb
   runtime.GOMAXPROCS(runtime.NumCPU())
 
-  http.HandleFunc("/", HomePage)
+  http.HandleFunc("/", abkhttpd.F1)
+  http.HandleFunc("/help-http", abkhttpd.HelpHTTP)
+  http.HandleFunc("/help-zmq", abkhttpd.HelpZMQ)
+  http.HandleFunc("/status", abkhttpd.Status)
+
   http.HandleFunc("/get", GetReadKey)
   http.HandleFunc("/put", GetPushKey)
 
