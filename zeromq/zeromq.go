@@ -28,7 +28,7 @@ func ZmqRep(req_port int, rep_port int, read READ, push PUSH, del DELETE) {
     } else if msg_arr[0] == "delete" {
       del(msg_arr[1])
     } else {
-      fmt.Println("unhandled request sent: %s" % msg)
+      fmt.Printf("unhandled request sent: %s" % msg)
     }
     socket.Send(msg, 0)
   }
