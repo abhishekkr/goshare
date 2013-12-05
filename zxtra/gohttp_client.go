@@ -21,6 +21,10 @@ func PutURL(host string, port int, key string, val string) string{
                      host, port, key, val)
 }
 
+func DelURL(host string, port int, key string) string{
+  return fmt.Sprintf("http://%s:%d/del?key='%s'", host, port, key)
+}
+
 func HttpGet(url string) string{
   resp, err := http.Get(url)
   if err != nil {
@@ -44,6 +48,13 @@ func main(){
 
   fmt.Println("Updating a Key: 'myname'")
   resp = HttpGet(PutURL(*httphost, *httpport, "myname", "anonymous"))
+  fmt.Println("Response:", resp)
+  fmt.Println("Reading a Key: 'myname'")
+  resp = HttpGet(GetURL(*httphost, *httpport, "myname"))
+  fmt.Println("Response:", resp)
+
+  fmt.Println("Deleting a Key: 'myname'")
+  resp = HttpGet(DelURL(*httphost, *httpport, "myname"))
   fmt.Println("Response:", resp)
   fmt.Println("Reading a Key: 'myname'")
   resp = HttpGet(GetURL(*httphost, *httpport, "myname"))
