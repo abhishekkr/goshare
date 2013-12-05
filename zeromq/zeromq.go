@@ -19,22 +19,28 @@ func ZmqRep(req_port int, rep_port int, read READ, push PUSH, del DELETE) {
   fmt.Printf("ZMQ REQ/REP Daemon at port %d and %d\n", req_port, rep_port)
   for {
     msg, _ := socket.Recv(0)
-    fmt.Println("Got:", string(msg))
     msg_arr := strings.Fields(string(msg))
+    return_value := ""
     if msg_arr[0] == "read" {
-      read(msg_arr[1])
+      return_value = read(msg_arr[1])
     } else if msg_arr[0] == "push" {
-      push(msg_arr[1], strings.Join(msg_arr[2:], " "))
+      _value := strings.Join(msg_arr[2:], " ")
+      if push(msg_arr[1], _value) {
+        return_value = _value
+      }
     } else if msg_arr[0] == "delete" {
-      del(msg_arr[1])
+      if del(msg_arr[1]) {
+        return_value = msg_arr[1]
+      }
     } else {
       fmt.Printf("unhandled request sent: %s", msg)
     }
-    socket.Send(msg, 0)
+    socket.Send([]byte(return_value), 0)
+    fmt.Println("Got: [ ", string(msg), " ]; Sent: [ ", return_value, " ]")
   }
 }
 
-func ZmqReq(req_port int, rep_port int, dat ...string) {
+func ZmqReq(req_port int, rep_port int, dat ...string) []byte{
   fmt.Printf("ZMQ REQ/REP Client at port %d and %d\n", req_port, rep_port)
   context, _ := zmq.NewContext()
   socket, _ := context.NewSocket(zmq.REQ)
@@ -44,6 +50,7 @@ func ZmqReq(req_port int, rep_port int, dat ...string) {
   var msg string
   msg = strings.Join(dat, " ")
   socket.Send([]byte(msg), 0)
-  fmt.Printf("msg: %s\n", msg)
-  socket.Recv(0)
+  response, _ := socket.Recv(0)
+  fmt.Printf("msg: %s\nresponse: %s\n\n", msg, response)
+  return response
 }
