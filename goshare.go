@@ -16,6 +16,7 @@ import (
 var (
   db *levigo.DB
   dbpath      = flag.String("dbpath", "/tmp/GO.DB", "the path to DB")
+  httpuri     = flag.String("uri", "0.0.0.0", "what Port to Run HTTP Server at")
   httpport    = flag.Int("port", 9999, "what Port to Run HTTP Server at")
   req_port    = flag.Int("req-port", 9797, "what PORT to run ZMQ REQ at")
   rep_port    = flag.Int("rep-port", 9898, "what PORT to run ZMQ REP at")
@@ -65,7 +66,7 @@ func GoShare(){
   }
 
   // need to go CHAN passing msg to leveldb and back
-  go GoShareHTTP(db, *httpport)
+  go GoShareHTTP(db, *httpuri, *httpport)
   go GoShareZMQ(db, *req_port, *rep_port)
 
   do_you_wanna_continue()
