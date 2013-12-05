@@ -5,13 +5,13 @@ import (
   "runtime"
 
   "github.com/jmhodges/levigo"
+  abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
 
-  "github.com/abhishekkr/goshare/leveldb"
   "github.com/abhishekkr/goshare/zeromq"
 )
 
 func ReadKey(key string) string{
-  return abkleveldb.GetKey(key, db)
+  return abkleveldb.GetVal(key, db)
 }
 
 func PushKey(key string, val string) bool{

@@ -7,8 +7,8 @@ import (
   "time"
 
   "github.com/jmhodges/levigo"
+  abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
 
-  "github.com/abhishekkr/goshare/leveldb"
   "github.com/abhishekkr/goshare/httpd"
 )
 
@@ -16,7 +16,7 @@ func GetReadKey(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
 
   req.ParseForm()
-  val := abkleveldb.GetKey(req.Form["key"][0], db)
+  val := abkleveldb.GetVal(req.Form["key"][0], db)
   w.Write([]byte(val))
 }
 
