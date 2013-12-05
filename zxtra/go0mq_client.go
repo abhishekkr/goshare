@@ -16,8 +16,10 @@ func main(){
   flag.Parse()
   fmt.Printf("client ZeroMQ REP/REQ... at %d, %d", req_port, rep_port)
 
-  abkzeromq.ZmqReq(*req_port, *rep_port, "myname", "anon")
-  abkzeromq.ZmqReq(*req_port, *rep_port, "myname")
-  abkzeromq.ZmqReq(*req_port, *rep_port, "myname", "anonymous")
-  abkzeromq.ZmqReq(*req_port, *rep_port, "myname")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "push", "myname", "anon")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "read", "myname")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "push", "myname", "anonymous")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "read", "myname")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "delete", "myname")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "read", "myname")
 }
