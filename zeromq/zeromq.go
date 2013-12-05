@@ -8,8 +8,9 @@ import (
 
 type READ func(key string) string
 type PUSH func(key string, val string) bool
+type DELETE func(key string) bool
 
-func ZmqRep(req_port int, rep_port int, read READ, push PUSH) {
+func ZmqRep(req_port int, rep_port int, read READ, push PUSH, del DELETE) {
   context, _ := zmq.NewContext()
   socket, _ := context.NewSocket(zmq.REP)
   socket.Bind(fmt.Sprintf("tcp://127.0.0.1:%d", req_port))
@@ -20,10 +21,14 @@ func ZmqRep(req_port int, rep_port int, read READ, push PUSH) {
     msg, _ := socket.Recv(0)
     fmt.Println("Got:", string(msg))
     msg_arr := strings.Fields(string(msg))
-    if len(msg_arr) == 1 {
-      read(msg_arr[0])
-    } else if len(msg_arr) == 2 {
-      push(msg_arr[0], msg_arr[1])
+    if msg_arr[0] == "read" {
+      read(msg_arr[1])
+    } else if msg_arr[0] == "push" {
+      push(msg_arr[1], strings.Join(msg_arr[2:], " "))
+    } else if msg_arr[0] == "delete" {
+      del(msg_arr[1])
+    } else {
+      fmt.Println("unhandled request sent: %s" % msg)
     }
     socket.Send(msg, 0)
   }
