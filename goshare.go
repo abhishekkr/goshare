@@ -10,8 +10,7 @@ import (
   "time"
 
   "github.com/jmhodges/levigo"
-
-  abkleveldb "github.com/abhishekkr/goshare/leveldb"
+  abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
 )
 
 var (
