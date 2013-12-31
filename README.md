@@ -10,6 +10,8 @@
 
 ```
 
+[Tasks in Queue at Trello Board](https://trello.com/b/ZjDMRGQN/goshare)
+
 #### Go Share any data among the nodes. Over HTTP or ZeroMQ.
 
 * GOShare eases up communication over HTTP GET param based interaction.
