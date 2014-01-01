@@ -5,25 +5,23 @@ import (
   "runtime"
 
   "github.com/jmhodges/levigo"
-  abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
 
   "github.com/abhishekkr/goshare/zeromq"
 )
 
 func ReadKey(key string) string{
-  return abkleveldb.GetVal(key, db)
+  return GetVal(key)
 }
 
 func PushKey(key string, val string) bool{
-  return abkleveldb.PushKeyVal(key, val, db)
+  return PushKeyVal(key, val)
 }
 
 func DeleteKey(key string) bool{
-  return abkleveldb.DelKey(key, db)
+  return DelKey(key)
 }
 
-func GoShareZMQ(leveldb *levigo.DB, req_port int, rep_port int){
-  db = leveldb
+func GoShareZMQ(req_port int, rep_port int){
   fmt.Printf("starting ZeroMQ REP/REQ at %d/%d\n", req_port, rep_port)
   runtime.GOMAXPROCS(runtime.NumCPU())
 
