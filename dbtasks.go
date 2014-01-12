@@ -3,8 +3,6 @@ package goshare
 import (
   "time"
 
-  "github.com/jmhodges/levigo"
-
   abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
   levigoNS "github.com/abhishekkr/levigoNS"
   levigoTSDS "github.com/abhishekkr/levigoTSDS"
@@ -31,8 +29,8 @@ func DelKey(key string) bool{
 }
 
 
-func hmap_to_csv(hmap){
-  csv = ""
+func hmap_to_csv(hmap levigoNS.HashMap){
+  csv := ""
   for  key, value := range hmap {
     csv += key + "," + value + "\n"
   }
