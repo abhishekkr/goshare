@@ -72,7 +72,7 @@ func PushKeyValNowTSDS(key string, val string) bool{
 
 
 func DelKeyTSDS(key string) bool{
-  levigoNS.DeleteTSDS(key, db)
+  levigoTSDS.DeleteTSDS(key, db)
   return true
 }
 

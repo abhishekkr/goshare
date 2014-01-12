@@ -66,8 +66,8 @@ func GoShare(){
   }
 
   // need to go CHAN passing msg to leveldb and back
-  go GoShareHTTP(db, *httpuri, *httpport)
-  go GoShareZMQ(db, *req_port, *rep_port)
+  go GoShareHTTP(*httpuri, *httpport)
+  go GoShareZMQ(*req_port, *rep_port)
 
   do_you_wanna_continue()
 }
