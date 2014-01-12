@@ -62,7 +62,7 @@ func GetValTSDS(key string) string{
 
 
 func PushKeyValTSDS(key string, val string) bool{
-  return levigoTSDS.PushTSDS(key, val, time.Now() db)
+  return levigoTSDS.PushTSDS(key, val, time.Now(), db)
 }
 
 
