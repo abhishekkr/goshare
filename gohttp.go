@@ -6,8 +6,6 @@ import (
   "runtime"
   "time"
 
-  "github.com/jmhodges/levigo"
-
   "github.com/abhishekkr/goshare/httpd"
 )
 
@@ -15,7 +13,16 @@ func GetReadKey(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
 
   req.ParseForm()
-  val := GetVal(req.Form["key"][0], db)
+  keys := req.Form["key"]
+  task_type := req.Form["type"]
+
+  if len(task_type) > 0 {
+    _get_val := GetValTask(task_type[0])
+  }
+
+  if len(keys) > 0 {
+    val := _get_val(req.Form["key"][0], db)
+  }
   w.Write([]byte(val))
 }
 
@@ -23,9 +30,19 @@ func GetPushKey(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
 
   req.ParseForm()
-  status := PushKeyVal(req.Form["key"][0], req.Form["val"][0])
-  if status != true {
-    http.Error(w, "FATAL Error", http.StatusInternalServerError)
+  keys := req.Form["key"]
+  vals := req.Form["val"]
+  task_type := req.Form["type"]
+
+  if len(task_type) > 0 {
+    _push_keyval := PushKeyValTask(task_type[0])
+  }
+
+  if len(keys) > 0 && len(vals) > 0 {
+    status := _push_keyval(keys[0], vals[0])
+    if status != true {
+      http.Error(w, "FATAL Error", http.StatusInternalServerError)
+    }
   }
   w.Write([]byte("Success"))
 }
@@ -34,9 +51,18 @@ func GetDeleteKey(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
 
   req.ParseForm()
-  status := DelKey(req.Form["key"][0])
-  if status != true {
-    http.Error(w, "FATAL Error", http.StatusInternalServerError)
+  keys := req.Form["key"]
+  task_type := req.Form["type"]
+
+  if len(task_type) > 0 {
+    _del_key := DelKeyTask(task_type[0])
+  }
+
+  if len(keys) > 0 {
+    status := _del_key(keys[0])
+    if status != true {
+      http.Error(w, "FATAL Error", http.StatusInternalServerError)
+    }
   }
   w.Write([]byte("Success"))
 }
