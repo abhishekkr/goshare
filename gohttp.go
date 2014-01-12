@@ -16,9 +16,10 @@ func GetReadKey(w http.ResponseWriter, req *http.Request) {
   keys := req.Form["key"]
   task_type := req.Form["type"]
 
-  if len(task_type) > 0 {
-    _get_val := GetValTask(task_type[0])
+  if len(task_type) == 0 {
+    task_type = ["default"]
   }
+  _get_val := GetValTask(task_type[0])
 
   if len(keys) > 0 {
     val := _get_val(req.Form["key"][0], db)
@@ -34,9 +35,10 @@ func GetPushKey(w http.ResponseWriter, req *http.Request) {
   vals := req.Form["val"]
   task_type := req.Form["type"]
 
-  if len(task_type) > 0 {
-    _push_keyval := PushKeyValTask(task_type[0])
+  if len(task_type) == 0 {
+    task_type = ["default"]
   }
+  _push_keyval := PushKeyValTask(task_type[0])
 
   if len(keys) > 0 && len(vals) > 0 {
     status := _push_keyval(keys[0], vals[0])
@@ -54,9 +56,10 @@ func GetDeleteKey(w http.ResponseWriter, req *http.Request) {
   keys := req.Form["key"]
   task_type := req.Form["type"]
 
-  if len(task_type) > 0 {
-    _del_key := DelKeyTask(task_type[0])
+  if len(task_type) == 0 {
+    task_type = ["default"]
   }
+  _del_key := DelKeyTask(task_type[0])
 
   if len(keys) > 0 {
     status := _del_key(keys[0])
