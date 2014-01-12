@@ -4,8 +4,6 @@ import (
   "fmt"
   "runtime"
 
-  "github.com/jmhodges/levigo"
-
   "github.com/abhishekkr/goshare/zeromq"
 )
 

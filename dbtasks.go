@@ -29,7 +29,7 @@ func DelKey(key string) bool{
 }
 
 
-func hmap_to_csv(hmap levigoNS.HashMap){
+func hmap_to_csv(hmap levigoNS.HashMap) string{
   csv := ""
   for  key, value := range hmap {
     csv += key + "," + value + "\n"
@@ -60,12 +60,14 @@ func GetValTSDS(key string) string{
 
 
 func PushKeyValTSDS(key string, val string) bool{
-  return levigoTSDS.PushTSDS(key, val, time.Now(), db)
+  levigoTSDS.PushTSDS(key, val, time.Now(), db)
+  return true
 }
 
 
 func PushKeyValNowTSDS(key string, val string) bool{
-  return levigoTSDS.PushNowTSDS(key, val, db)
+  levigoTSDS.PushNowTSDS(key, val, db)
+  return true
 }
 
 
