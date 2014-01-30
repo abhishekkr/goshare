@@ -37,13 +37,10 @@ func do_you_wanna_continue(){
   var input string
   for {
     fmt.Println("Do you wanna exit. (yes|no):\n\n")
-    _, err := fmt.Scanf("%s", &input)
-    if err != nil {
-      panic("Oh Hell! Simple Waiting Input bombed for ya...")
-    }
-    if input == "yes" || input == "y" {
-      break
-    }
+
+    fmt.Scanf("%s", &input)
+
+    if input == "yes" || input == "y" { break }
   }
 }
 
