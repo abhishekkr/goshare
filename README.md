@@ -78,3 +78,5 @@ Now visit the the link asked by it and get the help page.
 * [levigo](https://github.com/jmhodges/levigo/blob/master/README.md) (the go library utilized to access leveldb)
 * [zeroMQ](http://zeromq.org/) (the supercharged Sockets giving REQuest/REPly power)
 * [gozmq](https://github.com/alecthomas/gozmq) GoLang ZeroMQ Bindings used here
+
+[![baby-gopher](https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png)](http://www.babygopher.org)
