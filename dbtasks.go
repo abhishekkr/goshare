@@ -39,7 +39,7 @@ func hmap_to_csv(hmap levigoNS.HashMap) string{
 
 
 func GetValNS(key string) string{
-  return hmap_to_csv(levigoNS.ReadNS(key, db))
+  return hmap_to_csv(levigoNS.ReadNSRecursive(key, db))
 }
 
 
