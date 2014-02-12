@@ -51,6 +51,10 @@ make it run on another port using following required flags
   * go run zxtra/go0mq_client.go -req-port=8000 -rep-port=8001
 ```
 
+>
+> To utilize it "zxtra/gohttp_client.go" and "zxtra/go0mq_client.go" can be referred on how to utilize capabilities of GoShare.
+>
+
 ***
 
 #### Structure:
@@ -78,5 +82,7 @@ Now visit the the link asked by it and get the help page.
 * [levigo](https://github.com/jmhodges/levigo/blob/master/README.md) (the go library utilized to access leveldb)
 * [zeroMQ](http://zeromq.org/) (the supercharged Sockets giving REQuest/REPly power)
 * [gozmq](https://github.com/alecthomas/gozmq) GoLang ZeroMQ Bindings used here
+* [levigoNS](https://github.com/abhishekkr/levigoNS) NameSpace KeyVal capabilities around leveldb via levigo
+* [levigoTSDS](https://github.com/abhishekkr/levigoTSDS) TimeSeries KeyVal capabilties around leveldb via levigoNS
 
 [![baby-gopher](https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png)](http://www.babygopher.org)
