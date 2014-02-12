@@ -16,7 +16,7 @@
     <div class="wrapper">
       <header>
         <h1>GoShare</h1>
-        <p>Go Share your Key-Val datastore (using leveldb) over HTTP &amp;/or ZeroMQ</p>
+        <p>Go Share your TimeSeries/NameSpace/KeyVal DataStore (using leveldb) over HTTP &amp;/or ZeroMQ</p>
 
         <p class="view"><a href="https://github.com/abhishekkr/goshare">View the Project on GitHub <small>abhishekkr/goshare</small></a></p>
 
@@ -39,6 +39,8 @@
 /____/
 
 </code></pre>
+
+<p><a href="https://trello.com/b/ZjDMRGQN/goshare">Tasks in Queue at Trello Board</a></p>
 
 <h4>
 <a name="go-share-any-data-among-the-nodes-over-http-or-zeromq" class="anchor" href="#go-share-any-data-among-the-nodes-over-http-or-zeromq"><span class="octicon octicon-link"></span></a>Go Share any data among the nodes. Over HTTP or ZeroMQ.</h4>
@@ -75,6 +77,10 @@ make it run on another port using following required flags</p>
 
   * go run zxtra/go0mq_client.go -req-port=8000 -rep-port=8001
 </code></pre>
+
+<blockquote>
+<p>To utilize it "zxtra/gohttp_client.go" and "zxtra/go0mq_client.go" can be referred on how to utilize capabilities of GoShare.</p>
+</blockquote>
 
 <hr><h4>
 <a name="structure" class="anchor" href="#structure"><span class="octicon octicon-link"></span></a>Structure:</h4>
@@ -117,7 +123,11 @@ make it run on another port using following required flags</p>
 <a href="http://zeromq.org/">zeroMQ</a> (the supercharged Sockets giving REQuest/REPly power)</li>
 <li>
 <a href="https://github.com/alecthomas/gozmq">gozmq</a> GoLang ZeroMQ Bindings used here</li>
-</ul>
+<li>
+<a href="https://github.com/abhishekkr/levigoNS">levigoNS</a> NameSpace KeyVal capabilities around leveldb via levigo</li>
+<li>
+<a href="https://github.com/abhishekkr/levigoTSDS">levigoTSDS</a> TimeSeries KeyVal capabilties around leveldb via levigoNS</li>
+</ul><p><a href="http://www.babygopher.org"><img src="https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png" alt="baby-gopher"></a></p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/abhishekkr">abhishekkr</a></p>
