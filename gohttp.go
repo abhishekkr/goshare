@@ -5,6 +5,7 @@ import (
   "net/http"
   "runtime"
   "time"
+  "strconv"
 
   "github.com/abhishekkr/goshare/httpd"
 )
@@ -24,7 +25,7 @@ func GetReadKey(w http.ResponseWriter, req *http.Request) {
 
   ret_val := ""
   if len(keys) > 0 {
-    ret_val = _get_val(req.Form["key"][0])
+    ret_val = _get_val(keys[0])
   }
   w.Write([]byte(ret_val))
 }
@@ -44,7 +45,21 @@ func GetPushKey(w http.ResponseWriter, req *http.Request) {
   _push_keyval := PushKeyValTask(task_type[0])
 
   if len(keys) > 0 && len(vals) > 0 {
-    status := _push_keyval(keys[0], vals[0])
+    var status bool
+
+    if task_type[0] == "tsds" {
+      year, _ := strconv.Atoi(req.Form["year"][0])
+      month, _ := strconv.Atoi(req.Form["month"][0])
+      day, _ := strconv.Atoi(req.Form["day"][0])
+      hour, _ := strconv.Atoi(req.Form["hour"][0])
+      min, _ := strconv.Atoi(req.Form["min"][0])
+      sec, _ := strconv.Atoi(req.Form["sec"][0])
+      status = PushKeyValTSDS(keys[0], vals[0],
+                             year, month, day, hour, min, sec)
+    } else {
+      status = _push_keyval(keys[0], vals[0])
+    }
+
     if status != true {
       http.Error(w, "FATAL Error", http.StatusInternalServerError)
     }

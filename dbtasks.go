@@ -59,8 +59,12 @@ func GetValTSDS(key string) string{
 }
 
 
-func PushKeyValTSDS(key string, val string) bool{
-  levigoTSDS.PushTSDS(key, val, time.Now(), db)
+func PushKeyValTSDS(key string, val string,
+                    year int, month int, day int,
+                    hour int, min int, sec int) bool{
+  key_time := time.Date(year, time.Month(month),
+                        day, hour, min, sec, 0, time.UTC)
+  levigoTSDS.PushTSDS(key, val, key_time, db)
   return true
 }
 
@@ -90,8 +94,6 @@ func GetValTask(task_type string) GetValFunc {
 func PushKeyValTask(task_type string) PushKeyValFunc {
   if task_type == "tsds-now" {
     return PushKeyValNowTSDS
-  } else if task_type == "tsds" {
-    return PushKeyValTSDS
   } else if task_type == "ns" {
     return PushKeyValNS
   }
