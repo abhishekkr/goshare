@@ -1,15 +1,21 @@
 package goshare
 
+
 import (
   "fmt"
   "net/http"
   "runtime"
   "time"
-  "strconv"
 
   "github.com/abhishekkr/goshare/httpd"
 )
 
+
+/*
+Get Records
+Multiple Keys can be passed in HTTP Request,
+but one request shall be just for one TaskType (default, ns, tsds, tsds-now)
+*/
 func GetReadKey(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
 
@@ -21,15 +27,16 @@ func GetReadKey(w http.ResponseWriter, req *http.Request) {
     task_type = make([]string, 1)
     task_type[0] = "default"
   }
-  _get_val := GetValTask(task_type[0])
 
-  ret_val := ""
-  if len(keys) > 0 {
-    ret_val = _get_val(keys[0])
-  }
-  w.Write([]byte(ret_val))
+  w.Write( []byte(GetValTask(task_type[0], keys[0])) )
 }
 
+
+/*
+Push Records
+Only one Key,Val can passed in HTTP Request,
+and one request shall be just for one TaskType (default, ns, tsds, tsds-now)
+*/
 func GetPushKey(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
 
@@ -37,36 +44,37 @@ func GetPushKey(w http.ResponseWriter, req *http.Request) {
   keys := req.Form["key"]
   vals := req.Form["val"]
   task_type := req.Form["type"]
+  status := false
 
   if len(task_type) == 0 {
     task_type = make([]string, 1)
     task_type[0] = "default"
   }
-  _push_keyval := PushKeyValTask(task_type[0])
-
-  if len(keys) > 0 && len(vals) > 0 {
-    var status bool
-
-    if task_type[0] == "tsds" {
-      year, _ := strconv.Atoi(req.Form["year"][0])
-      month, _ := strconv.Atoi(req.Form["month"][0])
-      day, _ := strconv.Atoi(req.Form["day"][0])
-      hour, _ := strconv.Atoi(req.Form["hour"][0])
-      min, _ := strconv.Atoi(req.Form["min"][0])
-      sec, _ := strconv.Atoi(req.Form["sec"][0])
-      status = PushKeyValTSDS(keys[0], vals[0],
-                             year, month, day, hour, min, sec)
-    } else {
-      status = _push_keyval(keys[0], vals[0])
+  if task_type[0] == "tsds" {
+    message_array := []string{
+      req.Form["year"][0],
+      req.Form["month"][0],
+      req.Form["day"][0],
+      req.Form["hour"][0],
+      req.Form["min"][0],
+      req.Form["sec"][0],
+      vals[0],
     }
-
-    if status != true {
-      http.Error(w, "FATAL Error", http.StatusInternalServerError)
-    }
+    status = PushKeyMsgArrayTSDS(keys[0], message_array)
+  } else {
+    status = PushKeyValTask(task_type[0], keys[0], vals[0])
   }
+
+  if status { http.Error(w, "FATAL Error", http.StatusInternalServerError) }
   w.Write([]byte("Success"))
 }
 
+
+/*
+Delete Records
+Multiple Keys can passed in HTTP Request,
+but one request shall be just for one TaskType (default, ns, tsds)
+*/
 func GetDeleteKey(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
 
@@ -78,17 +86,19 @@ func GetDeleteKey(w http.ResponseWriter, req *http.Request) {
     task_type = make([]string, 1)
     task_type[0] = "default"
   }
-  _del_key := DelKeyTask(task_type[0])
 
-  if len(keys) > 0 {
-    status := _del_key(keys[0])
-    if status != true {
+  for _, key := range keys {
+    if ! DelKeyTask(task_type[0], key) {
       http.Error(w, "FATAL Error", http.StatusInternalServerError)
     }
   }
   w.Write([]byte("Success"))
 }
 
+
+/*
+GoShare Handler for HTTP Requests
+*/
 func GoShareHTTP(httpuri string, httpport int) {
   runtime.GOMAXPROCS(runtime.NumCPU())
 

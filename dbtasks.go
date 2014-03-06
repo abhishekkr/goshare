@@ -1,17 +1,14 @@
 package goshare
 
 import (
+  "strings"
+  "strconv"
   "time"
 
   abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
   levigoNS "github.com/abhishekkr/levigoNS"
   levigoTSDS "github.com/abhishekkr/levigoTSDS"
 )
-
-
-type GetValFunc func(key string) string
-type PushKeyValFunc func(key string, val string) bool
-type DelKeyFunc func(key string) bool
 
 
 func GetVal(key string) string{
@@ -81,31 +78,43 @@ func DelKeyTSDS(key string) bool{
 }
 
 
-func GetValTask(task_type string) GetValFunc {
-  if task_type == "tsds" {
-    return GetValTSDS
-  } else if task_type == "ns" {
-    return GetValNS
-  }
-  return GetVal
+func PushKeyMsgArrayTSDS(key string, msg_arr []string) bool{
+  year, _ := strconv.Atoi(msg_arr[3])
+  month, _ := strconv.Atoi(msg_arr[4])
+  day, _ := strconv.Atoi(msg_arr[5])
+  hour, _ := strconv.Atoi(msg_arr[6])
+  min, _ := strconv.Atoi(msg_arr[7])
+  sec, _ := strconv.Atoi(msg_arr[8])
+  _value := strings.Join(msg_arr[9:], " ")
+  return PushKeyValTSDS(key, _value, year, month, day, hour, min, sec)
 }
 
 
-func PushKeyValTask(task_type string) PushKeyValFunc {
+func GetValTask(task_type string, key string) string{
+  if task_type == "tsds" {
+    return GetValTSDS(key)
+  } else if task_type == "ns" {
+    return GetValNS(key)
+  }
+  return GetVal(key)
+}
+
+
+func PushKeyValTask(task_type string, key string, value string) bool{
   if task_type == "tsds-now" {
-    return PushKeyValNowTSDS
+    return PushKeyValNowTSDS(key, value)
   } else if task_type == "ns" {
-    return PushKeyValNS
+    return PushKeyValNS(key, value)
   }
-  return PushKeyVal
+  return PushKeyVal(key, value)
 }
 
 
-func DelKeyTask(task_type string) DelKeyFunc {
+func DelKeyTask(task_type string, key string) bool{
   if task_type == "tsds" {
-    return DelKeyTSDS
+    return DelKeyTSDS(key)
   } else if task_type == "ns" {
-    return DelKeyNS
+    return DelKeyNS(key)
   }
-  return DelKey
+  return DelKey(key)
 }
