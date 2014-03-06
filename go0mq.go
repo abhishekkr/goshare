@@ -27,6 +27,11 @@ func goShareZmqRep(req_port int, rep_port int) {
         if _type == "tsds" {
           if PushKeyMsgArrayTSDS(_key, message_array[3:]){ _axn_result = true }
 
+        } else if _type == "tsds-csv" {
+          if PushKeyMsgArrayWithCSVTSDS(_key, message_array[3:]){
+            _axn_result = true
+          }
+
         } else {
           value := strings.Join(message_array, " ")
           if PushKeyValTask(_type, _key, value){ _axn_result = true }

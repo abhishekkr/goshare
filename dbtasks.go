@@ -90,6 +90,25 @@ func PushKeyMsgArrayTSDS(key string, msg_arr []string) bool{
 }
 
 
+func PushKeyMsgArrayWithCSVTSDS(base_key string, message_array []string) bool{
+  status := true
+  year, _ := strconv.Atoi(msg_arr[3])
+  month, _ := strconv.Atoi(msg_arr[4])
+  day, _ := strconv.Atoi(msg_arr[5])
+  hour, _ := strconv.Atoi(msg_arr[6])
+  min, _ := strconv.Atoi(msg_arr[7])
+  sec, _ := strconv.Atoi(msg_arr[8])
+  hashmap_value := golhashmap.Csv_to_hashmap( strings.Join(msg_arr[9:], " ") )
+  for child_key, child_value {
+    ns_key := fmt.Sprintf("%s:%s", base_key, child_key)
+    if ! PushKeyValTSDS(ns_key, child_value, year, month, day, hour, min, sec){
+      status = false
+    }
+  }
+  return status
+}
+
+
 func GetValTask(task_type string, key string) string{
   if task_type == "tsds" {
     return GetValTSDS(key)
