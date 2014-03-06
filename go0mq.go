@@ -54,7 +54,6 @@ func goShareZmqRep(req_port int, rep_port int) {
 
     }
     socket.Send([]byte(return_value), 0)
-    fmt.Println("Got: [ ", string(msg), " ]; Sent: [ ", return_value, " ]")
   }
 }
 
