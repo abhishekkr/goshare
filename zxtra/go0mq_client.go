@@ -22,6 +22,9 @@ func main(){
   abkzeromq.ZmqReq(*req_port, *rep_port, "push", "default", "myname", "anonymous")
   abkzeromq.ZmqReq(*req_port, *rep_port, "read", "default", "myname")
   abkzeromq.ZmqReq(*req_port, *rep_port, "delete", "default", "myname")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "delete", "default", "myname")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "read", "default", "myname")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "push", "default", "myname", "anon")
   abkzeromq.ZmqReq(*req_port, *rep_port, "read", "default", "myname")
 
   fmt.Println("Checking out levigoNS based storage...")
@@ -40,8 +43,12 @@ func main(){
   abkzeromq.ZmqReq(*req_port, *rep_port, "push", "tsds-now", "myname:last", "ymous")
   abkzeromq.ZmqReq(*req_port, *rep_port, "push", "tsds", "myname", "2014", "2", "10", "9", "18", "37", "anonymous")
   abkzeromq.ZmqReq(*req_port, *rep_port, "push", "tsds", "myname", "2014", "2", "10", "5", "28", "57", "untitles")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "push", "tsds-csv", "2014", "2", "10", "9", "18", "37", "myname,bob\nmyemail,bob@b.com")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "push", "tsds-csv", "2014", "2", "10", "9", "18", "37", "myname,alice\nmytxt,\"my email, bob@b.com\"")
   abkzeromq.ZmqReq(*req_port, *rep_port, "read", "tsds", "myname")
   abkzeromq.ZmqReq(*req_port, *rep_port, "read", "tsds", "myname:2014:February:10")
   abkzeromq.ZmqReq(*req_port, *rep_port, "delete", "tsds", "myname")
   abkzeromq.ZmqReq(*req_port, *rep_port, "read", "tsds", "myname")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "read", "tsds", "myemail")
+  abkzeromq.ZmqReq(*req_port, *rep_port, "read", "tsds", "mytxt")
 }

@@ -9,6 +9,7 @@ import (
 )
 
 
+/* handling Read/Push/Delete tasks diversion based on task-type */
 func goShareZmqRep(req_port int, rep_port int) {
   socket := abkzeromq.ZmqRep(req_port, rep_port)
   for {
@@ -24,32 +25,21 @@ func goShareZmqRep(req_port int, rep_port int) {
         if return_value != "" { _axn_result = true }
 
       case "push":
-        if _type == "tsds" {
-          if PushKeyMsgArrayTSDS(_key, message_array[3:]){ _axn_result = true }
-
-        } else if _type == "tsds-csv" {
-          if PushKeyMsgArrayWithCSVTSDS(_key, message_array[3:]){
-            _axn_result = true
-          }
-
-        } else {
-          value := strings.Join(message_array, " ")
-          if PushKeyValTask(_type, _key, value){ _axn_result = true }
-
-        }
+        if PushKeyValByType(_type, message_array){ _axn_result = true }
 
       case "delete":
         if DelKeyTask(_type, _key){ _axn_result = true }
     }
 
-    if _axn_result {
-      socket.Send([]byte(return_value), 0)
-    } else {
-      fmt.Printf("Error for request sent: %s", msg)
+    socket.Send([]byte(return_value), 0)
+    if ! _axn_result {
+      fmt.Printf("Error for request sent: %s\n", msg)
     }
   }
 }
 
+
+/* start a Daemon communicating over 2 ports over ZMQ Rep/Req */
 func GoShareZMQ(req_port int, rep_port int){
   fmt.Printf("starting ZeroMQ REP/REQ at %d/%d\n", req_port, rep_port)
   runtime.GOMAXPROCS(runtime.NumCPU())
