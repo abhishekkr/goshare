@@ -2,138 +2,152 @@ package goshare
 
 import (
   "strings"
-  "strconv"
-  "time"
 
   abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
   levigoNS "github.com/abhishekkr/levigoNS"
   levigoTSDS "github.com/abhishekkr/levigoTSDS"
+  golhashmap "github.com/abhishekkr/gol/golhashmap"
+  goltime "github.com/abhishekkr/gol/goltime"
 )
 
 
+/* Get value of given key */
 func GetVal(key string) string{
   return abkleveldb.GetVal(key, db)
 }
 
 
+/* Push a given set of Key-Val */
 func PushKeyVal(key string, val string) bool{
   return abkleveldb.PushKeyVal(key, val, db)
 }
 
 
+/* Empty Val for a given Key */
 func DelKey(key string) bool{
   return abkleveldb.DelKey(key, db)
 }
 
 
-func hmap_to_csv(hmap levigoNS.HashMap) string{
-  csv := ""
-  for  key, value := range hmap {
-    csv += key + "," + value + "\n"
-  }
-  return csv
-}
-
-
+/* Get value for all descendents of Namespace */
 func GetValNS(key string) string{
-  return hmap_to_csv(levigoNS.ReadNSRecursive(key, db))
+  hashmap := levigoNS.ReadNSRecursive(key, db)
+  return golhashmap.Hashmap_to_csv(hashmap)
 }
 
 
+/* Push a given Namespace-Key and its value */
 func PushKeyValNS(key string, val string) bool{
   return levigoNS.PushNS(key, val, db)
 }
 
 
+/* Delete a Namespace Key and all its value */
 func DelKeyNS(key string) bool{
-  levigoNS.DeleteNSRecursive(key, db)
-  return true
+  return levigoNS.DeleteNSRecursive(key, db)
 }
 
 
+/* Get value for the asked time-frame key, aah same NS */
 func GetValTSDS(key string) string{
-  return hmap_to_csv(levigoTSDS.ReadTSDS(key, db))
+  return golhashmap.Hashmap_to_csv(levigoTSDS.ReadTSDS(key, db))
 }
 
 
-func PushKeyValTSDS(key string, val string,
-                    year int, month int, day int,
-                    hour int, min int, sec int) bool{
-  key_time := time.Date(year, time.Month(month),
-                        day, hour, min, sec, 0, time.UTC)
-  levigoTSDS.PushTSDS(key, val, key_time, db)
+/* Push a key namespace-d with goltime.Timestamp  */
+func PushKeyValTSDS(key string, val string, timestamp goltime.Timestamp) bool{
+  if levigoTSDS.PushTSDS(key, val, timestamp.Time(), db) == "" { return false }
   return true
 }
 
 
+/* Push a key namespace-d with current time */
 func PushKeyValNowTSDS(key string, val string) bool{
-  levigoTSDS.PushNowTSDS(key, val, db)
+  if levigoTSDS.PushNowTSDS(key, val, db) == "" { return false }
   return true
 }
 
 
-func DelKeyTSDS(key string) bool{
-  levigoTSDS.DeleteTSDS(key, db)
-  return true
-}
-
-
-func PushKeyMsgArrayTSDS(key string, msg_arr []string) bool{
-  year, _ := strconv.Atoi(msg_arr[3])
-  month, _ := strconv.Atoi(msg_arr[4])
-  day, _ := strconv.Atoi(msg_arr[5])
-  hour, _ := strconv.Atoi(msg_arr[6])
-  min, _ := strconv.Atoi(msg_arr[7])
-  sec, _ := strconv.Atoi(msg_arr[8])
-  _value := strings.Join(msg_arr[9:], " ")
-  return PushKeyValTSDS(key, _value, year, month, day, hour, min, sec)
-}
-
-
-func PushKeyMsgArrayWithCSVTSDS(base_key string, message_array []string) bool{
+/* Push a key-val TSDS pair from CSV message */
+func PushCSVTSDS(csv_string string, timestamp goltime.Timestamp) bool{
   status := true
-  year, _ := strconv.Atoi(msg_arr[3])
-  month, _ := strconv.Atoi(msg_arr[4])
-  day, _ := strconv.Atoi(msg_arr[5])
-  hour, _ := strconv.Atoi(msg_arr[6])
-  min, _ := strconv.Atoi(msg_arr[7])
-  sec, _ := strconv.Atoi(msg_arr[8])
-  hashmap_value := golhashmap.Csv_to_hashmap( strings.Join(msg_arr[9:], " ") )
-  for child_key, child_value {
-    ns_key := fmt.Sprintf("%s:%s", base_key, child_key)
-    if ! PushKeyValTSDS(ns_key, child_value, year, month, day, hour, min, sec){
-      status = false
-    }
+  _time := timestamp.Time()
+  hashmap_key_value := golhashmap.Csv_to_hashmap(csv_string)
+  for _key, _val := range hashmap_key_value {
+    _val = strings.Replace(_val, "\n", " ", -1)
+    if levigoTSDS.PushTSDS(_key, _val, _time, db) == "" { status = false }
   }
   return status
 }
 
 
+/* Delete all keys under given namespace, same as NS */
+func DelKeyTSDS(key string) bool{
+  current_val := levigoTSDS.DeleteTSDS(key, db)
+  if len(current_val) > 0 { return false }
+  return true
+}
+
+
+/* Get a value based on task-type */
 func GetValTask(task_type string, key string) string{
   if task_type == "tsds" {
     return GetValTSDS(key)
+
   } else if task_type == "ns" {
     return GetValNS(key)
+
   }
+
   return GetVal(key)
 }
 
 
+/* Push a key-val based on task-type; except on with goltime.Timestamp */
 func PushKeyValTask(task_type string, key string, value string) bool{
   if task_type == "tsds-now" {
     return PushKeyValNowTSDS(key, value)
+
   } else if task_type == "ns" {
     return PushKeyValNS(key, value)
+
   }
+
   return PushKeyVal(key, value)
 }
 
 
+/* Push a key-val based on task-type; except on with goltime.Timestamp */
+func PushKeyValByType(task_type string, message_array []string) bool {
+  _key := message_array[2]
+
+  if task_type == "tsds" {
+    timestamp := goltime.CreateTimestamp(message_array[3:9])
+    _value := strings.Join(message_array[9:], " ")
+    return PushKeyValTSDS(_key, _value, timestamp)
+
+  } else if task_type == "tsds-csv" {
+    timestamp := goltime.CreateTimestamp(message_array[2:8])
+    csv_value := strings.Join(message_array[8:], "\n")
+    return PushCSVTSDS(csv_value, timestamp)
+
+  }
+
+  _value := strings.Join(message_array[3:], " ")
+  return PushKeyValTask(task_type, _key, _value)
+}
+
+
+/* Delete a key on task-type */
 func DelKeyTask(task_type string, key string) bool{
   if task_type == "tsds" {
     return DelKeyTSDS(key)
+
   } else if task_type == "ns" {
     return DelKeyNS(key)
+
   }
+
   return DelKey(key)
 }
+
