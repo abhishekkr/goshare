@@ -16,7 +16,7 @@
     <div class="wrapper">
       <header>
         <h1>GoShare</h1>
-        <p>Go Share your TimeSeries/NameSpace/KeyVal DataStore (using leveldb) over HTTP &amp;/or ZeroMQ</p>
+        <p>Go Share your TimeSeries|NameSpace KeyVal (with leveldb powers) over HTTP|ZeroMQ</p>
 
         <p class="view"><a href="https://github.com/abhishekkr/goshare">View the Project on GitHub <small>abhishekkr/goshare</small></a></p>
 
@@ -40,94 +40,59 @@
 
 </code></pre>
 
-<p><a href="https://trello.com/b/ZjDMRGQN/goshare">Tasks in Queue at Trello Board</a></p>
+<h4>
+<a name="whats-the-idea" class="anchor" href="#whats-the-idea"><span class="octicon octicon-link"></span></a>What's the idea?</h4>
+
+<p>A <a href="http://en.wikipedia.org/wiki/Time_series_database">TimeSeries DataStore</a> i.e. a data store built especially for the need of key-value transactions within a time-frame. Particular use-case of tracking change of state for a particular factor over a period of time.</p>
 
 <h4>
+<a name="why-build-one" class="anchor" href="#why-build-one"><span class="octicon octicon-link"></span></a>Why build one?</h4>
+
+<p>The requirement for FOSS datastore was to be</p>
+
+<ul>
+<li>built for timeseries <em>(not a common store with forced schema for it)</em>
+</li>
+<li>standalone <em>(simple to install/manage)</em>
+</li>
+<li>fast <em>(for data transaction)</em>
+</li>
+</ul><p>So it's easy to set-up and quick to dump data over. Most of the alternatives out there are either based off other components to be managed (also increasing up the hops, resource requirements, and more), some are commercial and some both.</p>
+
+<p>Other popular datastores built specifically for time-series data are:</p>
+
+<ul>
+<li>
+<a href="http://influxdb.org/">InfluxDB</a>, the most suited alternative</li>
+<li>
+<a href="http://square.github.io/cube/">Cube</a>, uses MongoDB as backend ...uhhoh</li>
+<li>
+<a href="http://www.gocircuit.org/vena.html">GoCircuit Vena</a>, think it requires ZooKeeper ...will have to see</li>
+<li>
+<a href="http://opentsdb.net/">OpenTSDB</a>, defers to Hadoop's HBASE ...handle that</li>
+<li>
+<a href="https://code.google.com/p/kairosdb/">KairosDB</a>, like OpenTSDB with Cassandra as base ...again</li>
+<li>
+<a href="https://tempo-db.com/">Tempo-DB</a> looks good, but <em>Commercial</em>
+</li>
+<li>
+<a href="http://www-01.ibm.com/software/data/informix/">IBM Informix</a> &amp; <a href="http://msdn.microsoft.com/en-us/library/ee362541.aspx">Microsoft StreamInsight</a> been mentioned at places mainly for CEP, <em>Commerical</em> ...whatever MS|IBM</li>
+</ul><h4>
+<a name="docguidesarticles" class="anchor" href="#docguidesarticles"><span class="octicon octicon-link"></span></a>Doc|Guides|Articles</h4>
+
+<ul>
+<li><a href="https://github.com/abhishekkr/goshare/blob/master/README.md">@ReadMe</a></li>
+</ul><h4>
 <a name="go-share-any-data-among-the-nodes-over-http-or-zeromq" class="anchor" href="#go-share-any-data-among-the-nodes-over-http-or-zeromq"><span class="octicon octicon-link"></span></a>Go Share any data among the nodes. Over HTTP or ZeroMQ.</h4>
 
 <ul>
 <li>GOShare eases up communication over HTTP GET param based interaction.</li>
-<li>ZeroMQ REQ/REP based synchronous communication model.</li>
+<li>ZeroMQ REQ/REP based quick synchronous communication model.</li>
 </ul><p>it's "go get"-able</p>
 
 <p><code>go get "github.com/abhishekkr/goshare"</code></p>
 
-<hr><h4>
-<a name="tryout" class="anchor" href="#tryout"><span class="octicon octicon-link"></span></a>Tryout:</h4>
-
-<pre lang="Shell"><code> go run zxtra/goshare_daemon.go -dbpath=/tmp/GOTSDB
-</code></pre>
-
-<p>By default it runs HTTP daemon at port 9999 and ZeroMQ daemon at 9797/9898,
-make it run on another port using following required flags</p>
-
-<pre lang="Shell"><code> go run zxtra/goshare_daemon.go -dbpath=/tmp/GOTSDB -port=8080 -req-port=8000 -rep-port=8001
-</code></pre>
-
-<pre lang="ASCII"><code>  Dummy Clients Using It
-
-  * go run zxtra/gohttp_client.go
-
-  * go run zxtra/go0mq_client.go
-
-
-  for custom Port: 8080 for HTTP; Port: 8000/8001 for ZeroMQ
-
-  * go run zxtra/gohttp_client.go -port=8080
-
-  * go run zxtra/go0mq_client.go -req-port=8000 -rep-port=8001
-</code></pre>
-
-<blockquote>
-<p>To utilize it "zxtra/gohttp_client.go" and "zxtra/go0mq_client.go" can be referred on how to utilize capabilities of GoShare.</p>
-</blockquote>
-
-<hr><h4>
-<a name="structure" class="anchor" href="#structure"><span class="octicon octicon-link"></span></a>Structure:</h4>
-
-<blockquote>
-<p>"goshare"'s methods to adapt these in your code:</p>
-
-<ul>
-<li>
-<p>GoShare() : it runs HTTP and ZeroMQ daemon in parallel goroutines</p>
-
-<blockquote>
-<p>has optional flags customization of:</p>
-
-<ul>
-<li>dbpath: path for LevelDB (default: /tmp/GO.DB)</li>
-<li>port: port to bind HTTP daemon (default: 9999)</li>
-<li>req-port, rep-port: ports to bind ZeroMQ REQ/REP daemon (default: 9797, 9898)</li>
-</ul>
-</blockquote>
-</li>
-<li><p>GoShareHTTP(&lt;levigo DB handle&gt;, &lt;http port as int&gt;) : it runs HTTP daemon</p></li>
-<li><p>GoShareZMQ(&lt;levigo DB handle&gt;, &lt;req-port as int&gt;, &lt;rep-port as int&gt;) : it runs ZMQ daemon</p></li>
-</ul>
-</blockquote>
-
-<hr><p>Now visit the the link asked by it and get the help page.</p>
-
-<h5>
-<a name="dependency" class="anchor" href="#dependency"><span class="octicon octicon-link"></span></a>Dependency</h5>
-
-<ul>
-<li>
-<a href="http://golang.org/doc/install">go lang</a> (obviously, the heart and soul of the app)</li>
-<li>
-<a href="http://en.wikipedia.org/wiki/LevelDB">leveldb</a> (we are using for datastore, it's awesome)</li>
-<li>
-<a href="https://github.com/jmhodges/levigo/blob/master/README.md">levigo</a> (the go library utilized to access leveldb)</li>
-<li>
-<a href="http://zeromq.org/">zeroMQ</a> (the supercharged Sockets giving REQuest/REPly power)</li>
-<li>
-<a href="https://github.com/alecthomas/gozmq">gozmq</a> GoLang ZeroMQ Bindings used here</li>
-<li>
-<a href="https://github.com/abhishekkr/levigoNS">levigoNS</a> NameSpace KeyVal capabilities around leveldb via levigo</li>
-<li>
-<a href="https://github.com/abhishekkr/levigoTSDS">levigoTSDS</a> TimeSeries KeyVal capabilties around leveldb via levigoNS</li>
-</ul><p><a href="http://www.babygopher.org"><img src="https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png" alt="baby-gopher"></a></p>
+<hr><p><a href="http://www.babygopher.org"><img src="https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png" alt="baby-gopher"></a></p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/abhishekkr">abhishekkr</a></p>
