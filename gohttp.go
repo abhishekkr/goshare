@@ -8,6 +8,7 @@ import (
   "time"
 
   "github.com/abhishekkr/goshare/httpd"
+  goltime "github.com/abhishekkr/gol/goltime"
 )
 
 
@@ -32,6 +33,15 @@ func GetReadKey(w http.ResponseWriter, req *http.Request) {
 }
 
 
+/* creates a goltime timestamp from fields in Request Form fields */
+func timestampFromGetRequest(req *http.Request) goltime.Timestamp {
+  return goltime.CreateTimestamp([]string {
+    req.Form["year"][0], req.Form["month"][0], req.Form["day"][0],
+    req.Form["hour"][0], req.Form["min"][0], req.Form["sec"][0],
+  })
+}
+
+
 /*
 Push Records
 Only one Key,Val can passed in HTTP Request,
@@ -50,22 +60,24 @@ func GetPushKey(w http.ResponseWriter, req *http.Request) {
     task_type = make([]string, 1)
     task_type[0] = "default"
   }
+
   if task_type[0] == "tsds" {
-    message_array := []string{
-      req.Form["year"][0],
-      req.Form["month"][0],
-      req.Form["day"][0],
-      req.Form["hour"][0],
-      req.Form["min"][0],
-      req.Form["sec"][0],
-      vals[0],
-    }
-    status = PushKeyMsgArrayTSDS(keys[0], message_array)
+    status = PushKeyValTSDS(keys[0], vals[0], timestampFromGetRequest(req))
+
+  } else if task_type[0] == "tsds-csv" {
+    csv_value := req.Form["csv_value"]
+    status = PushCSVTSDS(csv_value[0], timestampFromGetRequest(req))
+
   } else {
     status = PushKeyValTask(task_type[0], keys[0], vals[0])
+
   }
 
-  if status { http.Error(w, "FATAL Error", http.StatusInternalServerError) }
+  if ! status {
+    error_msg := fmt.Sprintf("FATAL Error: Pushing %q", req.Form)
+    http.Error(w, error_msg, http.StatusInternalServerError)
+    return
+  }
   w.Write([]byte("Success"))
 }
 
@@ -89,7 +101,9 @@ func GetDeleteKey(w http.ResponseWriter, req *http.Request) {
 
   for _, key := range keys {
     if ! DelKeyTask(task_type[0], key) {
-      http.Error(w, "FATAL Error", http.StatusInternalServerError)
+      error_msg := fmt.Sprintf("FATAL Error: Deleting %q", req.Form)
+      http.Error(w, error_msg, http.StatusInternalServerError)
+      return
     }
   }
   w.Write([]byte("Success"))

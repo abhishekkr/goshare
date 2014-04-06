@@ -60,6 +60,11 @@ func NowTSDSPutURL(host string, port int, key string, val string) string{
                      host, port, key, val)
 }
 
+func CSVTSDSPutURL(host string, port int, csv_value, year, month, day, hr, min, sec string) string{
+  return fmt.Sprintf("http://%s:%d/put?csv_value=%s&type=tsds-csv&year=%s&month=%s&day=%s&hour=%s&min=%s&sec=%s",
+                     host, port, csv_value, year, month, day, hr, min, sec)
+}
+
 func TSDSDelURL(host string, port int, key string) string{
   return fmt.Sprintf("http://%s:%d/del?key=%s&type=tsds", host, port, key)
 }
@@ -109,4 +114,8 @@ func main(){
   HttpGet(NowTSDSPutURL(*httphost, *httpport, "myname:last:first", "anon"))
   HttpGet(TSDSGetURL(*httphost, *httpport, "myname:last:first:2014:February"))
   HttpGet(TSDSDelURL(*httphost, *httpport, "myname"))
+
+  HttpGet(CSVTSDSPutURL(*httphost, *httpport, "yourname:last:first,trudy", "2014", "2", "10", "1", "1", "1"))
+  HttpGet(TSDSGetURL(*httphost, *httpport, "yourname:last:first:2014:February"))
+  HttpGet(TSDSDelURL(*httphost, *httpport, "yourname"))
 }
