@@ -23,6 +23,8 @@ var (
   cpuprofile  = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
+
+/* just a banner print */
 func banner(){
   fmt.Println("**************************************************")
   fmt.Println("  ___  ____      ___        __   _   __")
@@ -33,6 +35,8 @@ func banner(){
   fmt.Println("**************************************************")
 }
 
+
+/* checking if you still wanna keep the goshare up */
 func do_you_wanna_continue(){
   var input string
   for {
@@ -44,8 +48,9 @@ func do_you_wanna_continue(){
   }
 }
 
-func GoShare(){
-  banner()
+
+/* putting together base engine for GoShare */
+func GoShareEngine(){
   runtime.GOMAXPROCS(runtime.NumCPU())
 
   flag.Parse()
@@ -65,6 +70,12 @@ func GoShare(){
   // need to go CHAN passing msg to leveldb and back
   go GoShareHTTP(*httpuri, *httpport)
   go GoShareZMQ(*req_port, *rep_port)
+}
 
+
+/* GoShare DB */
+func GoShare(){
+  banner()
+  GoShareEngine()
   do_you_wanna_continue()
 }
