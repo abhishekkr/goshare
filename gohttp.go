@@ -17,6 +17,7 @@ func DBRest(httpMethod string, w http.ResponseWriter, req *http.Request) {
 	)
 
 	key_type, message_array := MessageArrayRest(req)
+	fmt.Println("~~~~~~~", key_type, message_array)
 
 	if key_type != "" {
 		switch httpMethod {
@@ -66,7 +67,7 @@ func MessageArrayRest(req *http.Request) (string, []string) {
 		dbdata = fmt.Sprintf("%s %s", key, val)
 	}
 
-	if key_type == "tsds" {
+	if strings.Split(key_type, "-")[0] == "tsds" {
 		timedot := fmt.Sprintf("%s %s %s %s %s %s",
 			req.FormValue("year"), req.FormValue("month"), req.FormValue("day"),
 			req.FormValue("hour"), req.FormValue("min"), req.FormValue("sec"))
