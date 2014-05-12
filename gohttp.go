@@ -10,13 +10,7 @@ import (
 	"github.com/abhishekkr/goshare/httpd"
 )
 
-/*
-DB Call HTTP Handler
-*/
-func DBRest(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	req.ParseForm()
-
+func DBRest(httpMethod string, w http.ResponseWriter, req *http.Request) {
 	var (
 		response_bytes []byte
 		axn_status     bool
@@ -25,7 +19,7 @@ func DBRest(w http.ResponseWriter, req *http.Request) {
 	key_type, message_array := MessageArrayRest(req)
 
 	if key_type != "" {
-		switch req.Method {
+		switch httpMethod {
 		case "GET":
 			response_bytes, axn_status = DBTasks("read", key_type, message_array)
 
@@ -40,6 +34,10 @@ func DBRest(w http.ResponseWriter, req *http.Request) {
 		}
 	} // else log_this corrupt request
 
+	DBRestResponse(w, req, response_bytes, axn_status)
+}
+
+func DBRestResponse(w http.ResponseWriter, req *http.Request, response_bytes []byte, axn_status bool) {
 	if !axn_status {
 		error_msg := fmt.Sprintf("FATAL Error: (DBTasks) %q \n", req.Form)
 		http.Error(w, error_msg, http.StatusInternalServerError)
@@ -79,6 +77,38 @@ func MessageArrayRest(req *http.Request) (string, []string) {
 	return key_type, strings.Fields(dbdata)
 }
 
+/* DB Call HTTP Handler */
+func DBRestHandler(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	req.ParseForm()
+
+	DBRest(req.Method, w, req)
+}
+
+/* HTTP GET DB-GET call handler */
+func GetReadKey(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	req.ParseForm()
+
+	DBRest("GET", w, req)
+}
+
+/* HTTP GET DB-POST call handler */
+func GetPushKey(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	req.ParseForm()
+
+	DBRest("POST", w, req)
+}
+
+/* HTTP GET DB-POST call handler */
+func GetDeleteKey(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	req.ParseForm()
+
+	DBRest("DELETE", w, req)
+}
+
 /*
 GoShare Handler for HTTP Requests
 */
@@ -90,7 +120,10 @@ func GoShareHTTP(httpuri string, httpport int) {
 	http.HandleFunc("/help-zmq", abkhttpd.HelpZMQ)
 	http.HandleFunc("/status", abkhttpd.Status)
 
-	http.HandleFunc("/db", DBRest)
+	http.HandleFunc("/db", DBRestHandler)
+	http.HandleFunc("/get", GetReadKey)
+	http.HandleFunc("/put", GetPushKey)
+	http.HandleFunc("/del", GetDeleteKey)
 
 	srv := &http.Server{
 		Addr:        fmt.Sprintf("%s:%d", httpuri, httpport),
