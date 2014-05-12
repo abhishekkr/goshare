@@ -19,6 +19,7 @@ func DBTasks(axn string, key_type string, message_array []string) ([]byte, bool)
 
 	switch axn {
 	case "read":
+		// returns axn error if key has empty value, if you gotta store then store, don't keep placeholders
 		response = GetValTask(key_type, key)
 		if response != "" {
 			axn_status = true
