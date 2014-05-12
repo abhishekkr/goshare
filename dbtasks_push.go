@@ -49,9 +49,9 @@ func PushKeyValSolo(task_type string, key string, value string, message_array *[
 
 	switch task_type {
 	case "tsds":
-		timestamp := goltime.CreateTimestamp((*message_array)[2:8])
-		_key := (*message_array)[8]
-		_value := strings.Join((*message_array)[9:], " ")
+		timestamp := goltime.CreateTimestamp((*message_array)[0:6])
+		_key := (*message_array)[6]
+		_value := strings.Join((*message_array)[7:], " ")
 		return PushKeyValTSDS(_key, _value, timestamp)
 
 	case "now":
@@ -69,8 +69,8 @@ func PushKeyValSolo(task_type string, key string, value string, message_array *[
 /* handles multi-item */
 func PushKeyValMulti(task_type string, multi_type string, message_array *[]string) bool {
 	var hashmap_key_value golhashmap.HashMap
-	timestamp := goltime.CreateTimestamp((*message_array)[2:8])
-	multi_value := strings.Join((*message_array)[8:], "\n")
+	timestamp := goltime.CreateTimestamp((*message_array)[0:6])
+	multi_value := strings.Join((*message_array)[6:], "\n")
 
 	switch multi_type {
 	case "csv":
@@ -96,8 +96,8 @@ func PushKeyValMulti(task_type string, multi_type string, message_array *[]strin
 
 /* Push a key-val based on task-type and multi|solo-type*/
 func PushKeyValByType(task_type string, message_array []string) bool {
-	_key := message_array[2]
-	_value := strings.Join(message_array[3:], " ")
+	_key := message_array[0]
+	_value := strings.Join(message_array[1:], " ")
 
 	task_type_tokens := strings.Split(task_type, "-")
 
