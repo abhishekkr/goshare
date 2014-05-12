@@ -1,12 +1,9 @@
 package goshare
 
 /* TBD-or-MayBeDone
-		   	   make it match all "<default|ns|tsds>(-<csv|json>)(-<now>)"
-		   	   1. pull out <default|ns|tsds>(-<now>) only as done currently
-		   	   2. <default|ns|tsds>-<csv|json>(-<now>) driven by encoding converted to hashmap, looped for call from (1)
-		        2.1 encoding for tsds (not now) should contain root time config, overridden by any key-val-time config
-            2.2 encoding for ns may contain a root parent-ns config to be used, overridden by any key-val-parent config
-*/
+ * encoding for tsds (not now) should contain root time config, overridden by any key-val-time config
+ * encoding for ns may contain a root parent-ns config to be used, overridden by any key-val-parent config
+ */
 
 import (
 	"strings"
@@ -46,13 +43,10 @@ func PushKeyValNowTSDS(key string, val string) bool {
 
 /* handles single-Item; delegates multi-item */
 func PushKeyValSolo(task_type string, key string, value string, message_array *[]string) bool {
-
 	switch task_type {
 	case "tsds":
 		timestamp := goltime.CreateTimestamp((*message_array)[0:6])
-		_key := (*message_array)[6]
-		_value := strings.Join((*message_array)[7:], " ")
-		return PushKeyValTSDS(_key, _value, timestamp)
+		return PushKeyValTSDS(key, value, timestamp)
 
 	case "now":
 		return PushKeyValNowTSDS(key, value)
@@ -69,15 +63,13 @@ func PushKeyValSolo(task_type string, key string, value string, message_array *[
 /* handles multi-item */
 func PushKeyValMulti(task_type string, multi_type string, message_array *[]string) bool {
 	var hashmap_key_value golhashmap.HashMap
-	timestamp := goltime.CreateTimestamp((*message_array)[0:6])
 	multi_value := strings.Join((*message_array)[6:], "\n")
 
 	switch multi_type {
 	case "csv":
 		hashmap_key_value = golhashmap.Csv_to_hashmap(multi_value)
 
-		/*make multi_type sent to golhashmap and get converter, pass multi_value and get hashmap*/
-
+	/*make multi_type sent to golhashmap and get converter, pass multi_value and get hashmap*/
 	//case "json":
 	//	hashmap_key_value = golhashmap.Json_to_hashmap(multi_value)
 
@@ -86,26 +78,38 @@ func PushKeyValMulti(task_type string, multi_type string, message_array *[]strin
 	}
 
 	status := true
-	_time := timestamp.Time()
 	for _key, _val := range hashmap_key_value {
 		_val = strings.Replace(_val, "\n", " ", -1)
-		PushKeyValSolo(task_type, _key, _val, message_array)
+		status = status && PushKeyValSolo(task_type, _key, _val, message_array)
 	}
 	return status
 }
 
-/* Push a key-val based on task-type and multi|solo-type*/
+/*
+Push a key-val based on task-type and multi|solo-type
+so if {default,ns,tsds,now} it's Solo
+else of so if {default,ns,tsds,now}-{csv,...} it's Multi
+*/
 func PushKeyValByType(task_type string, message_array []string) bool {
-	_key := message_array[0]
-	_value := strings.Join(message_array[1:], " ")
-
 	task_type_tokens := strings.Split(task_type, "-")
 
 	if len(task_type_tokens) == 2 {
 		return PushKeyValMulti(task_type_tokens[0], task_type_tokens[1], &message_array)
+
 	} else if len(task_type_tokens) == 1 {
-		return PushKeyValSolo(task_type_tokens[0], _key, _value, &message_array)
+		var key, value string
+
+		if task_type_tokens[0] == "tsds" {
+			key = message_array[6]
+			value = strings.Join(message_array[7:], " ")
+		} else {
+			key = message_array[0]
+			value = strings.Join(message_array[1:], " ")
+		}
+		return PushKeyValSolo(task_type_tokens[0], key, value, &message_array)
+
 	} else {
+		// log_this corrupted request
 		return false
 	}
 }

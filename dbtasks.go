@@ -2,9 +2,12 @@ package goshare
 
 /*
 [PATTERN]
-## message_array here is devoided of axn and key_type
 action {read, push, delete}
 type {default, ns, tsds, now}
+
+## message_array here is devoided of axn and key_type
+non-tsds {key&val, :type-data}
+tsds(-*) {tdot&key&val, tdot&:type-data}
 */
 
 // gotta refactor more and make this front for these tasks
