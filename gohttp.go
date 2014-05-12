@@ -17,7 +17,6 @@ func DBRest(httpMethod string, w http.ResponseWriter, req *http.Request) {
 	)
 
 	key_type, message_array := MessageArrayRest(req)
-	fmt.Println("~~~~~~~", key_type, message_array)
 
 	if key_type != "" {
 		switch httpMethod {
@@ -40,7 +39,7 @@ func DBRest(httpMethod string, w http.ResponseWriter, req *http.Request) {
 
 func DBRestResponse(w http.ResponseWriter, req *http.Request, response_bytes []byte, axn_status bool) {
 	if !axn_status {
-		error_msg := fmt.Sprintf("FATAL Error: (DBTasks) %q \n", req.Form)
+		error_msg := fmt.Sprintf("FATAL Error: (DBTasks) %q", req.Form)
 		http.Error(w, error_msg, http.StatusInternalServerError)
 
 	} else if len(response_bytes) == 0 {
@@ -58,6 +57,9 @@ return key_type and data as message_array identifiable by DBTasks
 func MessageArrayRest(req *http.Request) (string, []string) {
 	req.ParseForm()
 	key_type := req.FormValue("type")
+	if key_type == "" {
+		key_type = "default"
+	}
 
 	key := req.FormValue("key")
 	val := req.FormValue("val")
