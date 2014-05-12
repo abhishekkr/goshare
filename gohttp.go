@@ -1,137 +1,140 @@
 package goshare
 
-
 import (
-  "fmt"
-  "net/http"
-  "runtime"
-  "time"
+	"fmt"
+	"net/http"
+	"runtime"
+	"strings"
+	"time"
 
-  "github.com/abhishekkr/goshare/httpd"
-  goltime "github.com/abhishekkr/gol/goltime"
+	"github.com/abhishekkr/goshare/httpd"
 )
 
+func DBRest(httpMethod string, w http.ResponseWriter, req *http.Request) {
+	var (
+		response_bytes []byte
+		axn_status     bool
+	)
+
+	key_type, message_array := MessageArrayRest(req)
+
+	if key_type != "" {
+		switch httpMethod {
+		case "GET":
+			response_bytes, axn_status = DBTasks("read", key_type, message_array)
+
+		case "POST", "PUT":
+			response_bytes, axn_status = DBTasks("push", key_type, message_array)
+
+		case "DELETE":
+			response_bytes, axn_status = DBTasks("delete", key_type, message_array)
+
+		default:
+			// log_this corrupt request
+		}
+	} // else log_this corrupt request
+
+	DBRestResponse(w, req, response_bytes, axn_status)
+}
+
+func DBRestResponse(w http.ResponseWriter, req *http.Request, response_bytes []byte, axn_status bool) {
+	if !axn_status {
+		error_msg := fmt.Sprintf("FATAL Error: (DBTasks) %q", req.Form)
+		http.Error(w, error_msg, http.StatusInternalServerError)
+
+	} else if len(response_bytes) == 0 {
+		w.Write([]byte("Success"))
+
+	} else {
+		w.Write(response_bytes)
+
+	}
+}
 
 /*
-Get Records
-Multiple Keys can be passed in HTTP Request,
-but one request shall be just for one TaskType (default, ns, tsds, tsds-now)
+return key_type and data as message_array identifiable by DBTasks
 */
+func MessageArrayRest(req *http.Request) (string, []string) {
+	req.ParseForm()
+	key_type := req.FormValue("type")
+	if key_type == "" {
+		key_type = "default"
+	}
+
+	key := req.FormValue("key")
+	val := req.FormValue("val")
+	dbdata := req.FormValue("dbdata")
+
+	if key != "" {
+		dbdata = fmt.Sprintf("%s %s", key, val)
+	}
+
+	if strings.Split(key_type, "-")[0] == "tsds" {
+		timedot := fmt.Sprintf("%s %s %s %s %s %s",
+			req.FormValue("year"), req.FormValue("month"), req.FormValue("day"),
+			req.FormValue("hour"), req.FormValue("min"), req.FormValue("sec"))
+
+		dbdata = fmt.Sprintf("%s %s", timedot, dbdata)
+	}
+
+	return key_type, strings.Fields(dbdata)
+}
+
+/* DB Call HTTP Handler */
+func DBRestHandler(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	req.ParseForm()
+
+	DBRest(req.Method, w, req)
+}
+
+/* HTTP GET DB-GET call handler */
 func GetReadKey(w http.ResponseWriter, req *http.Request) {
-  w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "text/plain")
+	req.ParseForm()
 
-  req.ParseForm()
-  keys := req.Form["key"]
-  task_type := req.Form["type"]
-
-  if len(task_type) == 0 {
-    task_type = make([]string, 1)
-    task_type[0] = "default"
-  }
-
-  w.Write( []byte(GetValTask(task_type[0], keys[0])) )
+	DBRest("GET", w, req)
 }
 
-
-/* creates a goltime timestamp from fields in Request Form fields */
-func timestampFromGetRequest(req *http.Request) goltime.Timestamp {
-  return goltime.CreateTimestamp([]string {
-    req.Form["year"][0], req.Form["month"][0], req.Form["day"][0],
-    req.Form["hour"][0], req.Form["min"][0], req.Form["sec"][0],
-  })
-}
-
-
-/*
-Push Records
-Only one Key,Val can passed in HTTP Request,
-and one request shall be just for one TaskType (default, ns, tsds, tsds-now)
-*/
+/* HTTP GET DB-POST call handler */
 func GetPushKey(w http.ResponseWriter, req *http.Request) {
-  w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "text/plain")
+	req.ParseForm()
 
-  req.ParseForm()
-  keys := req.Form["key"]
-  vals := req.Form["val"]
-  task_type := req.Form["type"]
-  status := false
-
-  if len(task_type) == 0 {
-    task_type = make([]string, 1)
-    task_type[0] = "default"
-  }
-
-  if task_type[0] == "tsds" {
-    status = PushKeyValTSDS(keys[0], vals[0], timestampFromGetRequest(req))
-
-  } else if task_type[0] == "tsds-csv" {
-    csv_value := req.Form["csv_value"]
-    status = PushCSVTSDS(csv_value[0], timestampFromGetRequest(req))
-
-  } else {
-    status = PushKeyValTask(task_type[0], keys[0], vals[0])
-
-  }
-
-  if ! status {
-    error_msg := fmt.Sprintf("FATAL Error: Pushing %q", req.Form)
-    http.Error(w, error_msg, http.StatusInternalServerError)
-    return
-  }
-  w.Write([]byte("Success"))
+	DBRest("POST", w, req)
 }
 
-
-/*
-Delete Records
-Multiple Keys can passed in HTTP Request,
-but one request shall be just for one TaskType (default, ns, tsds)
-*/
+/* HTTP GET DB-POST call handler */
 func GetDeleteKey(w http.ResponseWriter, req *http.Request) {
-  w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "text/plain")
+	req.ParseForm()
 
-  req.ParseForm()
-  keys := req.Form["key"]
-  task_type := req.Form["type"]
-
-  if len(task_type) == 0 {
-    task_type = make([]string, 1)
-    task_type[0] = "default"
-  }
-
-  for _, key := range keys {
-    if ! DelKeyTask(task_type[0], key) {
-      error_msg := fmt.Sprintf("FATAL Error: Deleting %q", req.Form)
-      http.Error(w, error_msg, http.StatusInternalServerError)
-      return
-    }
-  }
-  w.Write([]byte("Success"))
+	DBRest("DELETE", w, req)
 }
-
 
 /*
 GoShare Handler for HTTP Requests
 */
 func GoShareHTTP(httpuri string, httpport int) {
-  runtime.GOMAXPROCS(runtime.NumCPU())
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
-  http.HandleFunc("/", abkhttpd.F1)
-  http.HandleFunc("/help-http", abkhttpd.HelpHTTP)
-  http.HandleFunc("/help-zmq", abkhttpd.HelpZMQ)
-  http.HandleFunc("/status", abkhttpd.Status)
+	http.HandleFunc("/", abkhttpd.F1)
+	http.HandleFunc("/help-http", abkhttpd.HelpHTTP)
+	http.HandleFunc("/help-zmq", abkhttpd.HelpZMQ)
+	http.HandleFunc("/status", abkhttpd.Status)
 
-  http.HandleFunc("/get", GetReadKey)
-  http.HandleFunc("/put", GetPushKey)
-  http.HandleFunc("/del", GetDeleteKey)
+	http.HandleFunc("/db", DBRestHandler)
+	http.HandleFunc("/get", GetReadKey)
+	http.HandleFunc("/put", GetPushKey)
+	http.HandleFunc("/del", GetDeleteKey)
 
-  srv := &http.Server{
-    Addr:        fmt.Sprintf("%s:%d", httpuri, httpport),
-    Handler:     http.DefaultServeMux,
-    ReadTimeout: time.Duration(5) * time.Second,
-  }
+	srv := &http.Server{
+		Addr:        fmt.Sprintf("%s:%d", httpuri, httpport),
+		Handler:     http.DefaultServeMux,
+		ReadTimeout: time.Duration(5) * time.Second,
+	}
 
-  fmt.Printf("access your goshare at http://%s:%d\n", httpuri, httpport)
-  err := srv.ListenAndServe()
-  fmt.Println("Game Over:", err)
+	fmt.Printf("access your goshare at http://%s:%d\n", httpuri, httpport)
+	err := srv.ListenAndServe()
+	fmt.Println("Game Over:", err)
 }
