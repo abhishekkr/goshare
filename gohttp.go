@@ -23,27 +23,33 @@ func DBRest(w http.ResponseWriter, req *http.Request) {
 	)
 
 	key_type, message_array := MessageArrayRest(req)
+
 	if key_type != "" {
 		switch req.Method {
 		case "GET":
 			response_bytes, axn_status = DBTasks("read", key_type, message_array)
+
 		case "POST", "PUT":
 			response_bytes, axn_status = DBTasks("push", key_type, message_array)
+
 		case "DELETE":
 			response_bytes, axn_status = DBTasks("delete", key_type, message_array)
+
 		default:
 			// log_this corrupt request
 		}
 	} // else log_this corrupt request
 
 	if !axn_status {
-		error_msg := fmt.Sprintf("FATAL Error: (DBTasks) %q", req.Form)
+		error_msg := fmt.Sprintf("FATAL Error: (DBTasks) %q \n", req.Form)
 		http.Error(w, error_msg, http.StatusInternalServerError)
-		return
-	} else if response_bytes != nil {
+
+	} else if len(response_bytes) == 0 {
 		w.Write([]byte("Success"))
+
 	} else {
 		w.Write(response_bytes)
+
 	}
 }
 
@@ -59,9 +65,7 @@ func MessageArrayRest(req *http.Request) (string, []string) {
 	dbdata := req.FormValue("dbdata")
 
 	if key != "" {
-		if val != "" {
-			dbdata = fmt.Sprintf("%s %s", key, val)
-		} // else log_this as corrupt request instead of delete
+		dbdata = fmt.Sprintf("%s %s", key, val)
 	}
 
 	if key_type == "tsds" {
