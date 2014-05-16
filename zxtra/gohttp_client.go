@@ -58,6 +58,11 @@ func NowTSDSPutURL(host string, port int, key string, val string) string {
 		host, port, key, val)
 }
 
+func CSVNSPutURL(host string, port int, csv_value string) string {
+	return fmt.Sprintf("http://%s:%d/put?dbdata=%s&type=ns-csv",
+		host, port, csv_value)
+}
+
 func CSVTSDSPutURL(host string, port int, csv_value, year, month, day, hr, min, sec string) string {
 	return fmt.Sprintf("http://%s:%d/put?dbdata=%s&type=tsds-csv&year=%s&month=%s&day=%s&hour=%s&min=%s&sec=%s",
 		host, port, csv_value, year, month, day, hr, min, sec)
@@ -117,6 +122,11 @@ func main() {
 	assertEqual(HttpGet(CSVTSDSPutURL(*httphost, *httpport, "yourname:last:first,trudy", "2014", "2", "10", "1", "1", "1")), "Success")
 	assertEqual(HttpGet(TSDSGetURL(*httphost, *httpport, "yourname:last:first:2014:February")), "yourname:last:first:2014:February:10:1:1:1,trudy\n")
 	assertEqual(HttpGet(TSDSDelURL(*httphost, *httpport, "yourname")), "Success")
+
+	assertEqual(HttpGet(CSVNSPutURL(*httphost, *httpport, "yname:frend:first,monica")), "Success")
+	assertEqual(HttpGet(CSVNSPutURL(*httphost, *httpport, "yname:frend:second,lolita")), "Success")
+	assertEqual(HttpGet(TSDSGetURL(*httphost, *httpport, "yname:frend")), "yname:frend:first,monica\nyname:frend:second,lolita\n")
+	assertEqual(HttpGet(TSDSDelURL(*httphost, *httpport, "yname")), "Success")
 
 	HttpGet(NowTSDSPutURL(*httphost, *httpport, "yname:last:first", "anon"))
 	HttpGet(TSDSGetURL(*httphost, *httpport, "yname:last:first"))

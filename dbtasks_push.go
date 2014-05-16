@@ -60,18 +60,24 @@ func PushKeyValSolo(task_type string, key string, value string, message_array *[
 	}
 }
 
+/* extract multi-val from message-array based on task-type */
+func getMultiVal(task_type string, message_array *[]string) string {
+	if task_type == "tsds" {
+		return strings.Join((*message_array)[6:], "\n")
+	}
+	return strings.Join((*message_array)[:], "\n")
+
+}
+
 /* handles multi-item */
 func PushKeyValMulti(task_type string, multi_type string, message_array *[]string) bool {
 	var hashmap_key_value golhashmap.HashMap
-	multi_value := strings.Join((*message_array)[6:], "\n")
+	multi_value := getMultiVal(task_type, message_array)
 
 	switch multi_type {
-	case "csv":
-		hashmap_key_value = golhashmap.Csv_to_hashmap(multi_value)
-
-	/*make multi_type sent to golhashmap and get converter, pass multi_value and get hashmap*/
-	//case "json":
-	//	hashmap_key_value = golhashmap.Json_to_hashmap(multi_value)
+	case "csv", "json":
+		hashmapEngine := golhashmap.GetHashMapEngine(multi_type)
+		hashmap_key_value = hashmapEngine.ToHashMap(multi_value)
 
 	default:
 		return false
