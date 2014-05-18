@@ -41,6 +41,7 @@ go_get_pkg(){
 }
 
 
+_OLD_PWD=$PWD
 cd $(dirname $0)
   goenv_on
 
@@ -56,6 +57,14 @@ elif [[ "$1" == "deps" ]]; then
 elif [[ "$1" == "test" ]]; then
   go test ./...
 
+elif [[ "$1" == "bin" ]]; then
+  bash $0 deps
+  mkdir -p ./bin
+  cd ./bin
+  go build ../zxtra/goshare_server.go
+  go build ../zxtra/goshare_daemon.go
+
+
 fi
 
-cd -
+cd $_OLD_PWD
