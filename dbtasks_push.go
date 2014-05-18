@@ -6,6 +6,7 @@ package goshare
  */
 
 import (
+	"fmt"
 	"strings"
 
 	golhashmap "github.com/abhishekkr/gol/golhashmap"
@@ -27,6 +28,7 @@ func PushKeyValNS(key string, val string) bool {
 
 /* Push a key namespace-d with goltime.Timestamp  */
 func PushKeyValTSDS(key string, val string, timestamp goltime.Timestamp) bool {
+	fmt.Println(timestamp)
 	if levigoTSDS.PushTSDS(key, val, timestamp.Time(), db) == "" {
 		return false
 	}
@@ -61,7 +63,7 @@ func PushKeyValSolo(task_type string, key string, value string, message_array *[
 }
 
 /* extract multi-val from message-array based on task-type */
-func getMultiVal(task_type string, message_array *[]string) string {
+func getMultiValASCII(task_type string, message_array *[]string) string {
 	if task_type == "tsds" {
 		return strings.Join((*message_array)[6:], "\n")
 	}
@@ -72,12 +74,15 @@ func getMultiVal(task_type string, message_array *[]string) string {
 /* handles multi-item */
 func PushKeyValMulti(task_type string, multi_type string, message_array *[]string) bool {
 	var hashmap_key_value golhashmap.HashMap
-	multi_value := getMultiVal(task_type, message_array)
+	multi_value := getMultiValASCII(task_type, message_array)
 
 	switch multi_type {
 	case "csv", "json":
 		hashmapEngine := golhashmap.GetHashMapEngine(multi_type)
 		hashmap_key_value = hashmapEngine.ToHashMap(multi_value)
+		if hashmap_key_value["parent_namespace"] != "" {
+			hashmap_key_value = PrefixParentNamespace(hashmap_key_value)
+		}
 
 	default:
 		return false
@@ -108,14 +113,32 @@ func PushKeyValByType(task_type string, message_array []string) bool {
 		if task_type_tokens[0] == "tsds" {
 			key = message_array[6]
 			value = strings.Join(message_array[7:], " ")
+
 		} else {
 			key = message_array[0]
 			value = strings.Join(message_array[1:], " ")
+
 		}
+
 		return PushKeyValSolo(task_type_tokens[0], key, value, &message_array)
 
 	} else {
 		// log_this corrupted request
 		return false
+
 	}
+}
+
+/*
+Prefixes Parent Namespaces to all key-val in HashMap if it has val for 'parent_namespace'
+*/
+func PrefixParentNamespace(hmap golhashmap.HashMap) golhashmap.HashMap {
+	var new_hmap golhashmap.HashMap
+	new_hmap = make(golhashmap.HashMap)
+
+	parent_namespace := hmap["parent_namespace"]
+	for key, val := range hmap {
+		new_hmap[fmt.Sprintf("%s:%s", parent_namespace, key)] = val
+	}
+	return new_hmap
 }
