@@ -61,9 +61,10 @@ elif [[ "$1" == "bin" ]]; then
   bash $0 deps
   mkdir -p ./bin
   cd ./bin
-  go build ../zxtra/goshare_server.go
-  go build ../zxtra/goshare_daemon.go
-
+  for go_code_to_build in `ls ../zxtra/goshare_*.go`; do
+    echo "Building: "$go_code_to_build
+    go build $go_code_to_build
+  done
 
 fi
 

@@ -23,6 +23,25 @@ it's "go get"-able
 
 ***
 
+#### Make Distributable Binary
+
+```bash
+./go-tasks.sh bin
+```
+
+This will create two distributable binaries *./bin/goshare_service* & *./bin/goshare_daemon*. Here *./bin/goshare_service* works as shown in README's 'Tryout' section.
+
+Whereas *./bin/goshare_daemon* can be used as a system service daemon, with following command line flags (along with flags mentioned in 'Tryout' section for ports and db-path)
+>
+> * start: ``` ./bin/goshare_daemon -daemon=start ```
+> * stop: ``` ./bin/goshare_daemon -daemon=stop ```
+> * status: ``` ./bin/goshare_daemon -daemon=status ```
+>
+> *this dumps daemon's current status to /tmp/goshare_daemon.status and pid to /tmp/goshare_daemon.pid*
+> *the status and pid file path can be changed with flags '-daemon-log=<path>' & '-daemon-pid=<path>' respectively*
+>
+
+
 #### Tryout:
 
 ```Shell
