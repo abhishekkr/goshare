@@ -1,7 +1,6 @@
 package goshare
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -15,8 +14,6 @@ import (
 
 	"github.com/jmhodges/levigo"
 )
-
-type Config map[string]*string
 
 var (
 	db *levigo.DB
@@ -34,7 +31,7 @@ func banner() {
 }
 
 /* checking if you still wanna keep the goshare up */
-func do_you_wanna_continue() {
+func DoYouWannaContinue() {
 	var input string
 	for {
 		fmt.Println("Do you wanna exit. (yes|no):\n\n")
@@ -47,21 +44,6 @@ func do_you_wanna_continue() {
 	}
 }
 
-/* config from flags */
-func ConfigFromFlags() Config {
-	var config Config
-	config = make(Config)
-	config["dbpath"] = flag.String("dbpath", "/tmp/GO.DB", "the path to DB")
-	config["httpuri"] = flag.String("uri", "0.0.0.0", "what Port to Run HTTP Server at")
-	config["httpport"] = flag.String("port", "9999", "what Port to Run HTTP Server at")
-	config["req_port"] = flag.String("req-port", "9797", "what PORT to run ZMQ REQ at")
-	config["rep_port"] = flag.String("rep-port", "9898", "what PORT to run ZMQ REP at")
-	config["cpuprofile"] = flag.String("cpuprofile", "", "write cpu profile to file")
-
-	//flag.Parse()
-	return config
-}
-
 /*
 putting together base engine for GoShare
 dbpath, httpuri, httpport, rep_port, req_port *string
@@ -70,9 +52,9 @@ func GoShareEngine(config Config) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// remember it will be same DB instance shared across goshare package
-	db = abkleveldb.CreateDB(*config["dbpath"])
-	if *config["cpuprofile"] != "" {
-		f, err := os.Create(*config["cpuprofile"])
+	db = abkleveldb.CreateDB(config["dbpath"])
+	if config["cpuprofile"] != "" {
+		f, err := os.Create(config["cpuprofile"])
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -83,11 +65,12 @@ func GoShareEngine(config Config) {
 		}()
 	}
 
-	_httpport, err_httpport := strconv.Atoi(*config["httpport"])
-	_req_port, err_req_port := strconv.Atoi(*config["req_port"])
-	_rep_port, err_rep_port := strconv.Atoi(*config["rep_port"])
+	_httpport, err_httpport := strconv.Atoi(config["http-port"])
+	fmt.Println(_httpport)
+	_req_port, err_req_port := strconv.Atoi(config["req-port"])
+	_rep_port, err_rep_port := strconv.Atoi(config["rep-port"])
 	if err_httpport == nil && err_rep_port == nil && err_req_port == nil {
-		go GoShareHTTP(*config["httpuri"], _httpport)
+		go GoShareHTTP(config["http-uri"], _httpport)
 		go GoShareZMQ(_req_port, _rep_port)
 	} else {
 		golerror.Boohoo("Port parameters to bind, error-ed while conversion to number.", true)
@@ -98,5 +81,5 @@ func GoShareEngine(config Config) {
 func GoShare() {
 	banner()
 	GoShareEngine(ConfigFromFlags())
-	do_you_wanna_continue()
+	DoYouWannaContinue()
 }
