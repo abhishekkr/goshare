@@ -73,7 +73,7 @@ func PacketFromHTTPRequest(dbAction string, req *http.Request) Packet {
 	packet.TaskType = task_type
 	task_type_tokens := strings.Split(task_type, "-")
 	packet.KeyType = task_type_tokens[0]
-	if packet.KeyType == "tsds" {
+	if packet.KeyType == "tsds" && packet.DBAction == "push" {
 		packet.TimeDot = goltime.TimestampFromHTTPRequest(req)
 	}
 
