@@ -18,19 +18,15 @@ func DelKeyNS(key string) bool {
 
 /* Delete all keys under given namespace, same as NS */
 func DelKeyTSDS(key string) bool {
-	current_val := levigoTSDS.DeleteTSDS(key, db)
-	if len(current_val) > 0 {
-		return false
-	}
-	return true
+	return levigoTSDS.DeleteTSDS(key, db)
 }
 
 /* Delete a key on task-type */
-func DelKeyTask(task_type string, key string) bool {
-	if task_type == "tsds" {
+func DelKeyTask(key_type string, key string) bool {
+	if key_type == "tsds" {
 		return DelKeyTSDS(key)
 
-	} else if task_type == "ns" {
+	} else if key_type == "ns" {
 		return DelKeyNS(key)
 
 	}

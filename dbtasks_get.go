@@ -24,11 +24,11 @@ func GetValTSDS(key string) string {
 }
 
 /* Get a value based on task-type */
-func GetValTask(task_type string, key string) string {
-	if task_type == "tsds" {
+func GetValTask(key_type string, key string) string {
+	if key_type == "tsds" {
 		return GetValTSDS(key)
 
-	} else if task_type == "ns" {
+	} else if key_type == "ns" {
 		return GetValNS(key)
 
 	}

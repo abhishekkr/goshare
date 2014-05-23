@@ -1,5 +1,7 @@
 package goshare
 
+import golhashmap "github.com/abhishekkr/gol/golhashmap"
+
 /*
 [PATTERN]
 action {read, push, delete}
@@ -10,28 +12,34 @@ non-tsds {key&val, :type-data}
 tsds(-*) {tdot&key&val, tdot&:type-data}
 */
 
-// gotta refactor more and make this front for these tasks
-func DBTasks(axn string, key_type string, message_array []string) ([]byte, bool) {
+/* Insulates communication from DBTasks
+Communications handled on byte streams can use it by passing standard-ized packet-array
+it prepares Packet and passes on to TasksOnPacket, 0MQ utilizes it */
+func DBTasks(packet_array []string) ([]byte, bool) {
+	packet := CreatePacket(packet_array)
+	packet.HashMap = make(golhashmap.HashMap)
+	return DBTasksOnPacket(packet)
+}
+
+/* Insulates communication from DBTasks
+Communication can directly create packet and pass it here, HTTP utilizes it directly */
+func DBTasksOnPacket(packet Packet) ([]byte, bool) {
 	response := ""
 	axn_status := false
 
-	key := message_array[0]
-
-	switch axn {
+	switch packet.DBAction {
 	case "read":
 		// returns axn error if key has empty value, if you gotta store then store, don't keep placeholders
-		response = GetValTask(key_type, key)
+		response = GetValTask(packet.KeyType, packet.KeyList[0])
 		if response != "" {
 			axn_status = true
 		}
 
 	case "push":
-		if PushKeyValByType(key_type, message_array) {
-			axn_status = true
-		}
+		axn_status = PushPacket(packet)
 
 	case "delete":
-		if DelKeyTask(key_type, key) {
+		if DelKeyTask(packet.KeyType, packet.KeyList[0]) {
 			axn_status = true
 		}
 	}
