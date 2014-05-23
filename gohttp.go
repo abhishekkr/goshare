@@ -7,36 +7,42 @@ import (
 	"strings"
 	"time"
 
+	golhashmap "github.com/abhishekkr/gol/golhashmap"
+	"github.com/abhishekkr/gol/goltime"
 	"github.com/abhishekkr/goshare/httpd"
 )
 
+/* enabling HTTP to formulate DBTasks call from HTTP Request */
 func DBRest(httpMethod string, w http.ResponseWriter, req *http.Request) {
 	var (
+		dbAction       string
 		response_bytes []byte
 		axn_status     bool
 	)
 
-	key_type, message_array := MessageArrayRest(req)
+	switch httpMethod {
+	case "GET":
+		dbAction = "read"
 
-	if key_type != "" {
-		switch httpMethod {
-		case "GET":
-			response_bytes, axn_status = DBTasks("read", key_type, message_array)
+	case "POST", "PUT":
+		dbAction = "push"
 
-		case "POST", "PUT":
-			response_bytes, axn_status = DBTasks("push", key_type, message_array)
+	case "DELETE":
+		dbAction = "delete"
 
-		case "DELETE":
-			response_bytes, axn_status = DBTasks("delete", key_type, message_array)
+	default:
+		// log_this corrupt request
+		return
+	}
 
-		default:
-			// log_this corrupt request
-		}
-	} // else log_this corrupt request
-
-	DBRestResponse(w, req, response_bytes, axn_status)
+	packet := PacketFromHTTPRequest(dbAction, req)
+	if packet.DBAction != "" {
+		response_bytes, axn_status = DBTasksOnPacket(packet)
+		DBRestResponse(w, req, response_bytes, axn_status)
+	}
 }
 
+/* send proper response back to client based on success/data/error */
 func DBRestResponse(w http.ResponseWriter, req *http.Request, response_bytes []byte, axn_status bool) {
 	if !axn_status {
 		error_msg := fmt.Sprintf("FATAL Error: (DBTasks) %q", req.Form)
@@ -52,32 +58,51 @@ func DBRestResponse(w http.ResponseWriter, req *http.Request, response_bytes []b
 }
 
 /*
-return key_type and data as message_array identifiable by DBTasks
+return Packet identifiable by DBTasksOnAction
 */
-func MessageArrayRest(req *http.Request) (string, []string) {
+func PacketFromHTTPRequest(dbAction string, req *http.Request) Packet {
+	packet := Packet{}
+	packet.HashMap = make(golhashmap.HashMap)
+	packet.DBAction = dbAction
+
 	req.ParseForm()
-	key_type := req.FormValue("type")
-	if key_type == "" {
-		key_type = "default"
+	task_type := req.FormValue("type")
+	if task_type == "" {
+		task_type = "default"
+	}
+	packet.TaskType = task_type
+	task_type_tokens := strings.Split(task_type, "-")
+	packet.KeyType = task_type_tokens[0]
+	if packet.KeyType == "tsds" {
+		packet.TimeDot = goltime.TimestampFromHTTPRequest(req)
 	}
 
-	key := req.FormValue("key")
-	val := req.FormValue("val")
+	if len(task_type_tokens) > 1 {
+		packet.ValType = task_type_tokens[1]
+
+		if len(task_type_tokens) == 3 {
+			thirdTokenFeatureHTTP(&packet, req)
+		}
+	}
+
 	dbdata := req.FormValue("dbdata")
-
+	key := req.FormValue("key")
 	if key != "" {
-		dbdata = fmt.Sprintf("%s %s", key, val)
+		dbdata = fmt.Sprintf("%s\n%s", key, req.FormValue("val"))
+	} else if dbdata == "" {
+		return Packet{}
 	}
+	decodeData(&packet, strings.Split(dbdata, "\n"))
 
-	if strings.Split(key_type, "-")[0] == "tsds" {
-		timedot := fmt.Sprintf("%s %s %s %s %s %s",
-			req.FormValue("year"), req.FormValue("month"), req.FormValue("day"),
-			req.FormValue("hour"), req.FormValue("min"), req.FormValue("sec"))
+	return packet
+}
 
-		dbdata = fmt.Sprintf("%s %s", timedot, dbdata)
+/* third token handler in taskType */
+func thirdTokenFeatureHTTP(packet *Packet, req *http.Request) {
+	parentNS := req.FormValue("parentNS")
+	if parentNS != "" {
+		packet.ParentNS = parentNS
 	}
-
-	return key_type, strings.Fields(dbdata)
 }
 
 /* DB Call HTTP Handler */
