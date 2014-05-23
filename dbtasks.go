@@ -1,7 +1,5 @@
 package goshare
 
-import golhashmap "github.com/abhishekkr/gol/golhashmap"
-
 /*
 [PATTERN]
 action {read, push, delete}
@@ -17,7 +15,6 @@ Communications handled on byte streams can use it by passing standard-ized packe
 it prepares Packet and passes on to TasksOnPacket, 0MQ utilizes it */
 func DBTasks(packet_array []string) ([]byte, bool) {
 	packet := CreatePacket(packet_array)
-	packet.HashMap = make(golhashmap.HashMap)
 	return DBTasksOnPacket(packet)
 }
 

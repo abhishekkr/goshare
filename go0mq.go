@@ -5,31 +5,33 @@ import (
 	"runtime"
 	"strings"
 
-	abkzeromq "github.com/abhishekkr/goshare/zeromq"
+	zmq "github.com/alecthomas/gozmq"
+
+	golzmq "github.com/abhishekkr/gol/golzmq"
 )
 
 /* handling Read/Push/Delete tasks diversion based on task-type */
-func goShareZmqRep(req_port int, rep_port int) {
-	socket := abkzeromq.ZmqRep(req_port, rep_port)
+func goShareZmqRep(socket *zmq.Socket) {
+	var err_response string
 	for {
 		msg, _ := socket.Recv(0)
 		message_array := strings.Fields(string(msg))
+		response_bytes, axn_status := DBTasks(message_array)
 
-		axn, key_type := message_array[0], message_array[1]
-
-		response_bytes, axn_status := DBTasks(axn, key_type, message_array[2:])
-
-		socket.Send([]byte(response_bytes), 0)
-		if !axn_status {
-			fmt.Printf("Error for request sent: %s\n", msg)
+		if axn_status {
+			socket.Send([]byte(response_bytes), 0)
+		} else {
+			err_response = fmt.Sprintf("Error for request sent: %s", msg)
+			socket.Send([]byte(err_response), 0)
 		}
 	}
 }
 
 /* start a Daemon communicating over 2 ports over ZMQ Rep/Req */
-func GoShareZMQ(req_port int, rep_port int) {
-	fmt.Printf("starting ZeroMQ REP/REQ at %d/%d\n", req_port, rep_port)
+func GoShareZMQ(ip string, reply_ports []int) {
+	fmt.Printf("starting ZeroMQ REP/REQ at %v\n", reply_ports)
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	goShareZmqRep(req_port, rep_port)
+	socket := golzmq.ZmqReplySocket(ip, reply_ports)
+	goShareZmqRep(socket)
 }

@@ -39,14 +39,13 @@ func CreatePacket(packet_array []string) Packet {
 
 	task_type_tokens := strings.Split(packet.TaskType, "-")
 	packet.KeyType = task_type_tokens[0]
+	if packet.KeyType == "tsds" && packet.DBAction == "push" {
+		packet.TimeDot = goltime.CreateTimestamp(packet_array[2:8])
+		data_starts_from += 6
+	}
 
 	if len(task_type_tokens) > 1 {
 		packet.ValType = task_type_tokens[1]
-
-		if packet.KeyType == "tsds" {
-			packet.TimeDot = goltime.CreateTimestamp(packet_array[2:8])
-			data_starts_from = 8
-		}
 
 		if len(task_type_tokens) == 3 {
 			// if packet requirement grows more than 3, that's the limit

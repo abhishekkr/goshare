@@ -15,12 +15,12 @@ func GetVal(key string) string {
 /* Get value for all descendents of Namespace */
 func GetValNS(key string) string {
 	hashmap := levigoNS.ReadNSRecursive(key, db)
-	return golhashmap.Hashmap_to_csv(hashmap)
+	return golhashmap.HashMapToCSV(hashmap)
 }
 
 /* Get value for the asked time-frame key, aah same NS */
 func GetValTSDS(key string) string {
-	return golhashmap.Hashmap_to_csv(levigoTSDS.ReadTSDS(key, db))
+	return golhashmap.HashMapToCSV(levigoTSDS.ReadTSDS(key, db))
 }
 
 /* Get a value based on task-type */

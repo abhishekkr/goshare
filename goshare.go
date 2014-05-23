@@ -9,10 +9,11 @@ import (
 	"strconv"
 	"time"
 
-	golerror "github.com/abhishekkr/gol/golerror"
-	abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
-
 	"github.com/jmhodges/levigo"
+
+	golerror "github.com/abhishekkr/gol/golerror"
+	gollist "github.com/abhishekkr/gol/gollist"
+	abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
 )
 
 var (
@@ -46,7 +47,7 @@ func DoYouWannaContinue() {
 
 /*
 putting together base engine for GoShare
-dbpath, httpuri, httpport, rep_port, req_port *string
+dbpath, server_uri, httpport, rep_port, *string
 */
 func GoShareEngine(config Config) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -65,13 +66,11 @@ func GoShareEngine(config Config) {
 		}()
 	}
 
-	_httpport, err_httpport := strconv.Atoi(config["http-port"])
-	fmt.Println(_httpport)
-	_req_port, err_req_port := strconv.Atoi(config["req-port"])
-	_rep_port, err_rep_port := strconv.Atoi(config["rep-port"])
-	if err_httpport == nil && err_rep_port == nil && err_req_port == nil {
-		go GoShareHTTP(config["http-uri"], _httpport)
-		go GoShareZMQ(_req_port, _rep_port)
+	_http_port, err_http_port := strconv.Atoi(config["http-port"])
+	_reply_ports, err_reply_ports := gollist.CSVToNumbers(config["rep-ports"])
+	if err_http_port == nil && err_reply_ports == nil {
+		go GoShareHTTP(config["server-uri"], _http_port)
+		go GoShareZMQ(config["server-uri"], _reply_ports)
 	} else {
 		golerror.Boohoo("Port parameters to bind, error-ed while conversion to number.", true)
 	}
