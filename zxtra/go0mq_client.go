@@ -32,7 +32,17 @@ func TestDefaultKeyType() {
 	assertEqual(err, nil)
 
 	result, err = golzmq.ZmqRequest(zmqSock, "read", "default", "myname")
-	expected = "anon"
+	expected = "myname,anon"
+	assertEqual(result, expected)
+	assertEqual(err, nil)
+
+	result, err = golzmq.ZmqRequest(zmqSock, "read", "default-csv", "myname")
+	expected = "myname,anon"
+	assertEqual(result, expected)
+	assertEqual(err, nil)
+
+	result, err = golzmq.ZmqRequest(zmqSock, "read", "default-json", "[\"myname\"]")
+	expected = "{\"myname\":\"anon\"}"
 	assertEqual(result, expected)
 	assertEqual(err, nil)
 
@@ -42,7 +52,7 @@ func TestDefaultKeyType() {
 	assertEqual(err, nil)
 
 	result, err = golzmq.ZmqRequest(zmqSock, "read", "default", "myname")
-	expected = "anonymous"
+	expected = "myname,anonymous"
 	assertEqual(result, expected)
 	assertEqual(err, nil)
 
@@ -104,6 +114,11 @@ func TestNSKeyType() {
 func TestTSDSKeyType() {
 	result, err = golzmq.ZmqRequest(zmqSock, "push", "tsds", "2014", "2", "10", "9", "8", "7", "myname:last:first", "anon")
 	expected = ""
+	assertEqual(result, expected)
+	assertEqual(err, nil)
+
+	result, err = golzmq.ZmqRequest(zmqSock, "read", "ns", "myname")
+	expected = "myname:last:first:2014:February:10:9:8:7,anon"
 	assertEqual(result, expected)
 	assertEqual(err, nil)
 

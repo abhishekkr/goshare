@@ -50,7 +50,7 @@ func PushFuncByKeyType(key_type string) FunkAxnParamKeyVal {
 }
 
 /* handles multi-item */
-func PushPacket(packet Packet) bool {
+func PushFromPacket(packet Packet) bool {
 	status := true
 	switch packet.KeyType {
 	case "tsds":

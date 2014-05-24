@@ -22,14 +22,27 @@ func DelKeyTSDS(key string) bool {
 }
 
 /* Delete a key on task-type */
-func DelKeyTask(key_type string, key string) bool {
-	if key_type == "tsds" {
-		return DelKeyTSDS(key)
+func DeleteFuncByKeyType(key_type string) FunkAxnParamKey {
+	switch key_type {
+	case "tsds":
+		return DelKeyTSDS
 
-	} else if key_type == "ns" {
-		return DelKeyNS(key)
+	case "ns":
+		return DelKeyNS
+
+	default:
+		return DelKey
 
 	}
+}
 
-	return DelKey(key)
+/* Delete multi-item */
+func DeleteFromPacket(packet Packet) bool {
+	status := true
+	axnFunk := DeleteFuncByKeyType(packet.KeyType)
+	for _, _key := range packet.KeyList {
+		status = status && axnFunk(_key)
+	}
+
+	return status
 }

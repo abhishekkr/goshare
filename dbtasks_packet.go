@@ -25,6 +25,8 @@ type Packet struct {
 }
 
 type FunkAxnParamKeyVal func(key string, val string) bool
+type FunkAxnParamKey func(key string) bool
+type FunkAxnParamKeyReturnMap func(key string) golhashmap.HashMap
 
 /*
 Create Packet from passed message array

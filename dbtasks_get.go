@@ -8,30 +8,71 @@ import (
 )
 
 /* Get value of given key */
-func GetVal(key string) string {
-	return abkleveldb.GetVal(key, db)
+func ReadKey(key string) golhashmap.HashMap {
+	var hashmap golhashmap.HashMap
+	hashmap = make(golhashmap.HashMap)
+	val := abkleveldb.GetVal(key, db)
+	if val == "" {
+		return hashmap
+	}
+	hashmap[key] = val
+	return hashmap
 }
 
 /* Get value for all descendents of Namespace */
-func GetValNS(key string) string {
-	hashmap := levigoNS.ReadNSRecursive(key, db)
-	return golhashmap.HashMapToCSV(hashmap)
+func ReadKeyNS(key string) golhashmap.HashMap {
+	return levigoNS.ReadNSRecursive(key, db)
 }
 
 /* Get value for the asked time-frame key, aah same NS */
-func GetValTSDS(key string) string {
-	return golhashmap.HashMapToCSV(levigoTSDS.ReadTSDS(key, db))
+func ReadKeyTSDS(key string) golhashmap.HashMap {
+	return levigoTSDS.ReadTSDS(key, db)
 }
 
-/* Get a value based on task-type */
-func GetValTask(key_type string, key string) string {
-	if key_type == "tsds" {
-		return GetValTSDS(key)
+/* Delete a key on task-type */
+func ReadFuncByKeyType(key_type string) FunkAxnParamKeyReturnMap {
+	switch key_type {
+	case "tsds":
+		return ReadKeyTSDS
 
-	} else if key_type == "ns" {
-		return GetValNS(key)
+	case "ns":
+		return ReadKeyNS
+
+	default:
+		return ReadKey
 
 	}
+}
 
-	return GetVal(key)
+/* Delete multi-item */
+func ReadFromPacket(packet Packet) string {
+	var response string
+	var hashmap golhashmap.HashMap
+	hashmap = make(golhashmap.HashMap)
+
+	axnFunk := ReadFuncByKeyType(packet.KeyType)
+	for _, _key := range packet.KeyList {
+		hashmap = axnFunk(_key)
+		if len(hashmap) == 0 {
+			continue
+		}
+		response += responseByValType(packet.ValType, hashmap)
+	}
+
+	return response
+}
+
+/* transform response by ValType, if none default:csv */
+func responseByValType(valType string, response_map golhashmap.HashMap) string {
+	var response string
+
+	switch valType {
+	case "csv", "json":
+		hashmapEngine := golhashmap.GetHashMapEngine(valType)
+		response = hashmapEngine.FromHashMap(response_map)
+
+	default:
+		response = golhashmap.HashMapToCSV(response_map)
+	}
+	return response
 }

@@ -27,18 +27,16 @@ func DBTasksOnPacket(packet Packet) ([]byte, bool) {
 	switch packet.DBAction {
 	case "read":
 		// returns axn error if key has empty value, if you gotta store then store, don't keep placeholders
-		response = GetValTask(packet.KeyType, packet.KeyList[0])
+		response = ReadFromPacket(packet)
 		if response != "" {
 			axn_status = true
 		}
 
 	case "push":
-		axn_status = PushPacket(packet)
+		axn_status = PushFromPacket(packet)
 
 	case "delete":
-		if DelKeyTask(packet.KeyType, packet.KeyList[0]) {
-			axn_status = true
-		}
+		axn_status = DeleteFromPacket(packet)
 	}
 
 	return []byte(response), axn_status

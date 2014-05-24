@@ -76,9 +76,9 @@ func assertEqual(body interface{}, expected_body interface{}) {
 // for default key-type
 func TestDefaultKeyType() {
 	assertEqual(HttpGet(PutURL(*httphost, *httpport, "default", "myname", "anon")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "default", "myname")), "anon")
+	assertEqual(HttpGet(GetURL(*httphost, *httpport, "default", "myname")), "myname,anon")
 	assertEqual(HttpGet(PutURL(*httphost, *httpport, "default", "myname", "anonymous")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "default", "myname")), "anonymous")
+	assertEqual(HttpGet(GetURL(*httphost, *httpport, "default", "myname")), "myname,anonymous")
 	assertEqual(HttpGet(DelURL(*httphost, *httpport, "default", "myname")), "Success")
 	assertEqual(HttpGet(GetURL(*httphost, *httpport, "default", "myname")), "FATAL Error: (DBTasks) map[\"type\":[\"default\"] \"key\":[\"myname\"]]\n")
 }
