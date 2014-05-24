@@ -1,7 +1,8 @@
 ## GoShare Philosophy
 
-##### *(in short)*
-### GoShare can be used to have *persistent* Time-Series, Namespace-KeyVal or typical Key-Val data-store over HTTP and ZeroMQ communication capability as independent server (or built-in for Golang applications).
+##### *(in short)* **GoShare can be used to have *persistent* Time-Series, Namespace-KeyVal or typical Key-Val data-store over HTTP and ZeroMQ communication capability as independent server (or built-in for Golang applications).**
+
+---
 
 #### What the hell is it?
 GoShare is an engine for Time-Series Data-Store, a datastore tailor-fit built to suit the requirement of storing varying states of any type of attribute along the timeline.
@@ -20,9 +21,9 @@ There are not a page long list of alternatives for this.
 
 When I ideated it, the only solutions available were not self-dependent (using Zookeeper, MongoDB). Hence they were not actually alternative of an independent (born-for-it) Time-Series Data-Store. Also, I don't consider (stupid) closed-source projects for my FOSS initiatives.
 I needed such independent datastore for another monitoring project of mine where I didn't wanted to have more than one services to worry about for the core of my montitoring service. That would have like Watchmen for Watchmen for...
-Then later a project started (["InfluxDB"]())  when I already started this. Which is in some way similar to this project but with much larger workforce behind it. It's also OpenSource, written in Golang.
+Then later a project started (["InfluxDB"](http://influxdb.org/))  when I already started this. Which is in some way similar to this project but with much larger workforce behind it. It's also OpenSource, written in Golang.
 
-I didn't re-invented the entire wheel just the improved upon the design and made it suit the road. The core of this datastore sits and inter-woven key-val store ["leveldb"]() (it's an awesome, made for performance key-val store mechanism by some (x)Googlers which also the core of super-awesome [Riak]()).
+I didn't re-invented the entire wheel just the improved upon the design and made it suit the road. The core of this datastore sits and inter-woven key-val store ["leveldb"](https://code.google.com/p/leveldb/) (it's an awesome, made for performance key-val store mechanism by some (x)Googlers which also the core of super-awesome [Riak](http://basho.com/riak/)).
 
 I also wanted to give it an awesome super communication channel which is not there in other alternative last I checked. Currently it allows communication ZeroMQ Req/Rep connections along with HTTP calls.
 
@@ -37,9 +38,9 @@ Then we've the power of ZeroMQ to communicate with it (as mentioned before) enab
 #### It's an Engine, so where is the Train?
 The repo itself provides an extra piece of code allowing creation of service/daemon binaries to start using it and trying the power real quick.
 
-As for a proper Train driving this engine, in parallel I've started design of [MomentDB]() which will utilize it and enable having multiple style load-balanced, replicated and fail-over mechanisms for it. Just hold on for few months, design is almost done... development spike has started in pieces.
+As for a proper Train driving this engine, in parallel I've started design of [MomentDB](https://github.com/abhishekkr/momentdb) which will utilize it and enable having multiple style load-balanced, replicated and fail-over mechanisms for it. Just hold on for few months, design is almost done... development spike has started in pieces.
 
-The monitoring system which lead to its creation, has also seen the light of spiking. It can be kept track of at [ChaacMonitoring](), but there is a very dumb structure there till now. It will show you GoShare in action but not of much utlization.
+The monitoring system which lead to its creation, has also seen the light of spiking. It can be kept track of at [ChaacMonitoring](https://github.com/ChaacMonitoring), but there is a very dumb structure there till now. It will show you GoShare in action but not of much utlization.
 
 ---
 
@@ -49,4 +50,4 @@ It's not built for typical key-val or namespace key-val data storage but on the 
 
 ---
 
-[Get QuickStart at GoShare]()
+[Get QuickStart at GoShare](https://github.com/abhishekkr/goshare/wiki/QuickStart)
