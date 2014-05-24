@@ -56,6 +56,7 @@ elif [[ "$1" == "deps" ]]; then
 
 elif [[ "$1" == "test" ]]; then
   go test ./...
+  go run test/*.go
 
 elif [[ "$1" == "bin" ]]; then
   bash $0 deps
