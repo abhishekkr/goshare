@@ -143,7 +143,8 @@ GoShare Handler for HTTP Requests
 func GoShareHTTP(httpuri string, httpport int) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	http.HandleFunc("/", abkhttpd.F1)
+	http.HandleFunc("/", abkhttpd.Index)
+	http.HandleFunc("/quickstart", abkhttpd.QuickStart)
 	http.HandleFunc("/help-http", abkhttpd.HelpHTTP)
 	http.HandleFunc("/help-zmq", abkhttpd.HelpZMQ)
 	http.HandleFunc("/status", abkhttpd.Status)

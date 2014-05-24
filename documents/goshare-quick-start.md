@@ -6,7 +6,7 @@
 
 * have svn client, it's fine ``` svn co https://github.com/abhishekkr/goshare ```
 
-* have internet, ahhh... download and uncompress ``` https:// ```
+* ahhh... have internet, download and uncompress ``` https://github.com/abhishekkr/goshare/archive/v0.8.4.tar.gz ```
 
 ---
 
