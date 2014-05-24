@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	golassert "github.com/abhishekkr/gol/golassert"
 	golhashmap "github.com/abhishekkr/gol/golhashmap"
 )
 
@@ -62,90 +63,83 @@ func HttpGet(url string) string {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	fmt.Printf("Url: %s; with\n result:\n%s\n", url, string(body))
+	//fmt.Printf("Url: %s; with\n result:\n%s\n", url, string(body))
 	return string(body)
-}
-
-// just a helper assert
-func assertEqual(body interface{}, expected_body interface{}) {
-	if body != expected_body {
-		panic(fmt.Sprintf("[FAIL]\nExpected: '%s'\nRecieved: '%s'\n\n", expected_body, body))
-	}
 }
 
 // for default key-type
 func TestDefaultKeyType() {
-	assertEqual(HttpGet(PutURL(*httphost, *httpport, "default", "myname", "anon")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "default", "myname")), "myname,anon")
-	assertEqual(HttpGet(PutURL(*httphost, *httpport, "default", "myname", "anonymous")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "default", "myname")), "myname,anonymous")
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "default", "myname")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "default", "myname")), "FATAL Error: (DBTasks) map[\"type\":[\"default\"] \"key\":[\"myname\"]]\n")
+	golassert.AssertEqual(HttpGet(PutURL(*httphost, *httpport, "default", "myname", "anon")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "default", "myname")), "myname,anon")
+	golassert.AssertEqual(HttpGet(PutURL(*httphost, *httpport, "default", "myname", "anonymous")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "default", "myname")), "myname,anonymous")
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "default", "myname")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "default", "myname")), "FATAL Error: (DBTasks) map[\"type\":[\"default\"] \"key\":[\"myname\"]]\n")
 }
 
 // for ns key-type
 func TestNamespaceKeyType() {
-	assertEqual(HttpGet(PutURL(*httphost, *httpport, "ns", "myname:last:first", "anon")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "ns", "myname:last:first")), "myname:last:first,anon")
-	assertEqual(HttpGet(PutURL(*httphost, *httpport, "ns", "myname:last", "ymous")), "Success")
-	assertEqual(HttpGet(PutURL(*httphost, *httpport, "ns", "myname", "anonymous")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "ns", "myname:last")), "myname:last,ymous\nmyname:last:first,anon")
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "ns", "myname")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "ns", "myname:last")), "FATAL Error: (DBTasks) map[\"type\":[\"ns\"] \"key\":[\"myname:last\"]]\n")
+	golassert.AssertEqual(HttpGet(PutURL(*httphost, *httpport, "ns", "myname:last:first", "anon")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "ns", "myname:last:first")), "myname:last:first,anon")
+	golassert.AssertEqual(HttpGet(PutURL(*httphost, *httpport, "ns", "myname:last", "ymous")), "Success")
+	golassert.AssertEqual(HttpGet(PutURL(*httphost, *httpport, "ns", "myname", "anonymous")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "ns", "myname:last")), "myname:last,ymous\nmyname:last:first,anon")
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "ns", "myname")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "ns", "myname:last")), "FATAL Error: (DBTasks) map[\"type\":[\"ns\"] \"key\":[\"myname:last\"]]\n")
 }
 
 // for tsds key-type
 func TestTSDSKeyType() {
-	assertEqual(HttpGet(TSDSPutURL(*httphost, *httpport, "myname:last", "ymous", "2014", "2", "10", "1", "1", "1")), "Success")
-	assertEqual(HttpGet(TSDSPutURL(*httphost, *httpport, "myname", "anonymous", "2014", "2", "10", "9", "8", "7")), "Success")
-	assertEqual(HttpGet(TSDSPutURL(*httphost, *httpport, "myname", "untitled", "2014", "2", "10", "0", "1", "7")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "myname:last")), "myname:last:2014:February:10:1:1:1,ymous")
+	golassert.AssertEqual(HttpGet(TSDSPutURL(*httphost, *httpport, "myname:last", "ymous", "2014", "2", "10", "1", "1", "1")), "Success")
+	golassert.AssertEqual(HttpGet(TSDSPutURL(*httphost, *httpport, "myname", "anonymous", "2014", "2", "10", "9", "8", "7")), "Success")
+	golassert.AssertEqual(HttpGet(TSDSPutURL(*httphost, *httpport, "myname", "untitled", "2014", "2", "10", "0", "1", "7")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "myname:last")), "myname:last:2014:February:10:1:1:1,ymous")
 
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "myname")), "myname:last:2014:February:10:1:1:1,ymous\nmyname:2014:February:10:9:8:7,anonymous\nmyname:2014:February:10:0:1:7,untitled")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "myname:2014:February:10")), "myname:2014:February:10:9:8:7,anonymous\nmyname:2014:February:10:0:1:7,untitled")
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "myname")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "myname")), "FATAL Error: (DBTasks) map[\"type\":[\"tsds\"] \"key\":[\"myname\"]]\n")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "myname")), "myname:last:2014:February:10:1:1:1,ymous\nmyname:2014:February:10:9:8:7,anonymous\nmyname:2014:February:10:0:1:7,untitled")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "myname:2014:February:10")), "myname:2014:February:10:9:8:7,anonymous\nmyname:2014:February:10:0:1:7,untitled")
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "myname")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "myname")), "FATAL Error: (DBTasks) map[\"type\":[\"tsds\"] \"key\":[\"myname\"]]\n")
 }
 
 // for now key-type
 func TestNowKeyType() {
 	csvmap := golhashmap.GetHashMapEngine("csv")
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "yname")), "Success")
-	assertEqual(HttpGet(PutURL(*httphost, *httpport, "now", "yname:last:first", "zodiac")), "Success")
-	assertEqual(len(csvmap.ToHashMap(HttpGet(GetURL(*httphost, *httpport, "tsds", "yname:last:first")))), 1)
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "yname")), "Success")
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "yname")), "Success")
+	golassert.AssertEqual(HttpGet(PutURL(*httphost, *httpport, "now", "yname:last:first", "zodiac")), "Success")
+	golassert.AssertEqual(len(csvmap.ToHashMap(HttpGet(GetURL(*httphost, *httpport, "tsds", "yname:last:first")))), 1)
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "yname")), "Success")
 
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "myname")), "Success")
-	assertEqual(HttpGet(PutURL(*httphost, *httpport, "now", "myname:last:first", "ripper")), "Success")
-	assertEqual(len(csvmap.ToHashMap(HttpGet(GetURL(*httphost, *httpport, "tsds", "myname:last:first")))), 1)
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "myname")), "Success")
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "myname")), "Success")
+	golassert.AssertEqual(HttpGet(PutURL(*httphost, *httpport, "now", "myname:last:first", "ripper")), "Success")
+	golassert.AssertEqual(len(csvmap.ToHashMap(HttpGet(GetURL(*httphost, *httpport, "tsds", "myname:last:first")))), 1)
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "myname")), "Success")
 }
 
 // for csv val-type
 func TestForCSV() {
-	assertEqual(HttpGet(MultiTSDSPutURL(*httphost, *httpport, "csv", "yourname:last:first,trudy", "2014", "2", "10", "1", "1", "1")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "yourname:last:first:2014:February")), "yourname:last:first:2014:February:10:1:1:1,trudy")
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "yourname")), "Success")
+	golassert.AssertEqual(HttpGet(MultiTSDSPutURL(*httphost, *httpport, "csv", "yourname:last:first,trudy", "2014", "2", "10", "1", "1", "1")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "yourname:last:first:2014:February")), "yourname:last:first:2014:February:10:1:1:1,trudy")
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "yourname")), "Success")
 
-	assertEqual(HttpGet(MultiValPutURL(*httphost, *httpport, "ns-csv", "yname:frend:first,monica")), "Success")
-	assertEqual(HttpGet(MultiValPutURL(*httphost, *httpport, "ns-csv", "yname:frend:second,lolita")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "yname:frend")), "yname:frend:first,monica\nyname:frend:second,lolita")
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "yname")), "Success")
+	golassert.AssertEqual(HttpGet(MultiValPutURL(*httphost, *httpport, "ns-csv", "yname:frend:first,monica")), "Success")
+	golassert.AssertEqual(HttpGet(MultiValPutURL(*httphost, *httpport, "ns-csv", "yname:frend:second,lolita")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "yname:frend")), "yname:frend:first,monica\nyname:frend:second,lolita")
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "yname")), "Success")
 
-	assertEqual(HttpGet(MultiValPutURL(*httphost, *httpport, "ns-csv", "yname:frend:first,monica%0D%0Ayname:frend:second,lolita%0D%0Auname:frend:second,juno%0D%0A")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "yname:frend")), "yname:frend:first,monica\nyname:frend:second,lolita")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "uname:frend")), "uname:frend:second,juno")
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "yname")), "Success")
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "uname")), "Success")
+	golassert.AssertEqual(HttpGet(MultiValPutURL(*httphost, *httpport, "ns-csv", "yname:frend:first,monica%0D%0Ayname:frend:second,lolita%0D%0Auname:frend:second,juno%0D%0A")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "yname:frend")), "yname:frend:first,monica\nyname:frend:second,lolita")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "uname:frend")), "uname:frend:second,juno")
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "yname")), "Success")
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "uname")), "Success")
 }
 
 // for JSON val-type
 func TestForJSON() {
-	assertEqual(HttpGet(MultiValPutURL(*httphost, *httpport, "ns-json", "{\"power:first\":\"yay\",\"power:second\":\"way\",\"rower:second\":\"kay\"}")), "Success")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "power")), "power:first,yay\npower:second,way")
-	assertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "rower")), "rower:second,kay")
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "power")), "Success")
-	assertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "rower")), "Success")
+	golassert.AssertEqual(HttpGet(MultiValPutURL(*httphost, *httpport, "ns-json", "{\"power:first\":\"yay\",\"power:second\":\"way\",\"rower:second\":\"kay\"}")), "Success")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "power")), "power:first,yay\npower:second,way")
+	golassert.AssertEqual(HttpGet(GetURL(*httphost, *httpport, "tsds", "rower")), "rower:second,kay")
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "power")), "Success")
+	golassert.AssertEqual(HttpGet(DelURL(*httphost, *httpport, "tsds", "rower")), "Success")
 }
 
 // for &parentNS=parent:namespace
@@ -153,22 +147,22 @@ func TestWithParentNS() {
 	var url string
 
 	url = MultiValPutURL(*httphost, *httpport, "ns-csv-parent", "yname:frend:first,monica")
-	assertEqual(HttpGet(URLAppendParentNS(url, "animal:people")), "Success")
+	golassert.AssertEqual(HttpGet(URLAppendParentNS(url, "animal:people")), "Success")
 
 	url = MultiValPutURL(*httphost, *httpport, "ns-csv-parent", "yname:frend:second,lolita")
-	assertEqual(HttpGet(URLAppendParentNS(url, "animal:people")), "Success")
+	golassert.AssertEqual(HttpGet(URLAppendParentNS(url, "animal:people")), "Success")
 
 	url = URLAppendParentNS(GetURL(*httphost, *httpport, "tsds-csv-parent", "yname:frend"), "animal:people")
-	assertEqual(HttpGet(url), "animal:people:yname:frend:first,monica\nanimal:people:yname:frend:second,lolita")
+	golassert.AssertEqual(HttpGet(url), "animal:people:yname:frend:first,monica\nanimal:people:yname:frend:second,lolita")
 
 	url = URLAppendParentNS(GetURL(*httphost, *httpport, "tsds-csv-parent", "people:yname:frend"), "animal")
-	assertEqual(HttpGet(url), "animal:people:yname:frend:first,monica\nanimal:people:yname:frend:second,lolita")
+	golassert.AssertEqual(HttpGet(url), "animal:people:yname:frend:first,monica\nanimal:people:yname:frend:second,lolita")
 
 	url = GetURL(*httphost, *httpport, "tsds-csv-parent", "animal:people:yname:frend")
-	assertEqual(HttpGet(url), "animal:people:yname:frend:first,monica\nanimal:people:yname:frend:second,lolita")
+	golassert.AssertEqual(HttpGet(url), "animal:people:yname:frend:first,monica\nanimal:people:yname:frend:second,lolita")
 
 	url = URLAppendParentNS(DelURL(*httphost, *httpport, "tsds-csv-parent", "yname"), "animal:people")
-	assertEqual(HttpGet(url), "Success")
+	golassert.AssertEqual(HttpGet(url), "Success")
 }
 
 func main() {
@@ -181,4 +175,5 @@ func main() {
 	TestForCSV()
 	TestForJSON()
 	TestWithParentNS()
+	fmt.Println("passed not panic")
 }

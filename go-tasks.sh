@@ -55,8 +55,19 @@ elif [[ "$1" == "deps" ]]; then
   go_get_pkg
 
 elif [[ "$1" == "test" ]]; then
+  $0 bin
+  echo
+  echo "~~~~~Test Pieces~~~~~"
   go test ./...
-  go run test/*.go
+  echo
+  echo "~~~~~Test Features~~~~~"
+  for feature_test in `ls ./tests/go*_client.go`; do
+    echo ">> Testing: "$feature_test
+    ./bin/goshare_daemon -daemon=start -dbpath=/tmp/GOSHARE.TEST.DB
+    go run $feature_test
+    ./bin/goshare_daemon -daemon=stop
+    rm -rf /tmp/GOSHARE.TEST.DB
+  done
 
 elif [[ "$1" == "bin" ]]; then
   bash $0 deps

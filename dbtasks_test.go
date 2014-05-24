@@ -3,6 +3,8 @@ package goshare
 import (
 	"testing"
 
+	golassert "github.com/abhishekkr/gol/golassert"
+	golhashmap "github.com/abhishekkr/gol/golhashmap"
 	goltime "github.com/abhishekkr/gol/goltime"
 	abklevigoNS "github.com/abhishekkr/levigoNS"
 	abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
@@ -19,14 +21,12 @@ func setupTestData() {
 	abklevigoNS.PushNS("upstate:2014:January:2:12:11:20", "up", db)
 }
 
-func TestGetVal(t *testing.T) {
+func TestReadKey(t *testing.T) {
 	setupTestData()
 
-	expected_val := "down"
-	result_val := GetVal("upstate:2014:January:2:12:1:20")
-	if expected_val != result_val {
-		t.Error("Fail: Get", result_val, "instead of", expected_val)
-	}
+	expected_val := "upstate:2014:January:2:12:1:20,down"
+	result_val := golhashmap.HashMapToCSV(ReadKey("upstate:2014:January:2:12:1:20"))
+	golassert.AssertEqual(expected_val, result_val)
 
 	abkleveldb.CloseAndDeleteDB(test_dbpath, db)
 }
@@ -67,15 +67,13 @@ func TestDelKey(t *testing.T) {
 	abkleveldb.CloseAndDeleteDB(test_dbpath, db)
 }
 
-func TestGetValNS(t *testing.T) {
+func TestReadKeyNS(t *testing.T) {
 	setupTestData()
 
 	expected_val := "upstate:2014:January:2:12:1:20,down\n"
-	expected_val += "upstate:2014:January:2:12:11:20,up\n"
-	result_val := GetValNS("upstate:2014:January")
-	if expected_val != result_val {
-		t.Error("Fail: Get", result_val, "instead of", expected_val)
-	}
+	expected_val += "upstate:2014:January:2:12:11:20,up"
+	result_val := golhashmap.HashMapToCSV(ReadKeyNS("upstate:2014:January"))
+	golassert.AssertEqual(expected_val, result_val)
 
 	abkleveldb.CloseAndDeleteDB(test_dbpath, db)
 }
@@ -112,31 +110,32 @@ func TestDelKeyNS(t *testing.T) {
 	abkleveldb.CloseAndDeleteDB(test_dbpath, db)
 }
 
-func TestGetValTSDS(t *testing.T) {
+func TestReadKeyTSDS(t *testing.T) {
 	setupTestData()
 
 	expected_val := "upstate:2014:January:2:12:1:20,down\n"
-	expected_val += "upstate:2014:January:2:12:11:20,up\n"
-	result_val := GetValTSDS("upstate:2014:January:2")
-	if expected_val != result_val {
-		t.Error("Fail: Get", result_val, "instead of", expected_val)
-	}
+	expected_val += "upstate:2014:January:2:12:11:20,up"
+	result_val := golhashmap.HashMapToCSV(ReadKeyTSDS("upstate:2014:January:2"))
+	golassert.AssertEqual(expected_val, result_val)
 
 	abkleveldb.CloseAndDeleteDB(test_dbpath, db)
 }
 
 func TestPushKeyValTSDS(t *testing.T) {
 	setupTestData()
-
-	ohtime := goltime.Timestamp{
+	packet := Packet{}
+	packet.HashMap = make(golhashmap.HashMap)
+	packet.HashMap["oh"] = "yeah"
+	packet.ParentNS = "phrase"
+	packet.TimeDot = goltime.Timestamp{
 		Year: 2014, Month: 1, Day: 2, Hour: 12, Min: 1, Sec: 20,
 	}
-	status := PushKeyValTSDS("oh", "yeah", ohtime)
+	packet.KeyType = "tsds"
+
+	status := PushFromPacket(packet)
 	expected_val := "yeah"
 	result_val := abkleveldb.GetVal("val::oh:2014:January:2:12:1:20", db)
-	if expected_val != result_val {
-		t.Error("Fail: Get", result_val, "instead of", expected_val)
-	}
+	golassert.AssertEqual(expected_val, result_val)
 	if !status {
 		t.Error("Fail: Wrong status returned by PushKeyValTSDS")
 	}
