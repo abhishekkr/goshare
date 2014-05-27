@@ -147,6 +147,7 @@ func GoShareHTTP(httpuri string, httpport int) {
 	http.HandleFunc("/quickstart", abkhttpd.QuickStart)
 	http.HandleFunc("/help-http", abkhttpd.HelpHTTP)
 	http.HandleFunc("/help-zmq", abkhttpd.HelpZMQ)
+	http.HandleFunc("/concept", abkhttpd.Concept)
 	http.HandleFunc("/status", abkhttpd.Status)
 
 	http.HandleFunc("/db", DBRestHandler)
