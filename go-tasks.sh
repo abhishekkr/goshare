@@ -69,6 +69,13 @@ elif [[ "$1" == "test" ]]; then
     rm -rf /tmp/GOSHARE.TEST.DB
   done
 
+elif [[ "$1" == "wiki" ]]; then
+  $0 bin
+  echo
+  echo "~~~~~Visit wiki at GoShare HTTP~~~~~"
+  echo "~~~~~   http://0.0.0.0:9999    ~~~~~"
+  ./bin/goshare_server
+
 elif [[ "$1" == "bin" ]]; then
   bash $0 deps
   mkdir -p ./bin
