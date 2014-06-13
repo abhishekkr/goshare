@@ -33,6 +33,8 @@
 >
 > * [read] features for tsds like: {latest,this}_{year,month,week,day,hour,hour,min,dot}
 >
+> * [read] for tsds: mean, median, max, min, from_X_to_Y, radius_X_of_Y, more_than_X, less_than_X, matching_to_X, not_matching_to_X
+>
 
 #### *Design Decisions*
 
