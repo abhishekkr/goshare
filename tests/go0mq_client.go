@@ -8,6 +8,9 @@ import (
 	golassert "github.com/abhishekkr/gol/golassert"
 	golhashmap "github.com/abhishekkr/gol/golhashmap"
 	golzmq "github.com/abhishekkr/gol/golzmq"
+
+	goshare "github.com/abhishekkr/goshare"
+	goshare_requestor "github.com/abhishekkr/goshare/requestor"
 )
 
 var (
@@ -243,6 +246,42 @@ func TestParentNSValType() {
 
 	result, err = golzmq.ZmqRequest(zmqSock, "read", "tsds-default-parent", "people", "myname")
 	expected = "Error for request sent: read tsds-default-parent people myname"
+	golassert.AssertEqual(result, expected)
+	golassert.AssertEqual(err, nil)
+}
+
+func TestRequestorZeromq() {
+	_packet := goshare.Packet{}
+	_packet.KeyType = "default"
+
+	_packet.DBAction = "push"
+	_packet.HashMap = make(golhashmap.HashMap)
+	_packet.HashMap["an0n"] = "ymous"
+	strPacket := string(goshare_requestor.RequestPacketBytes(&_packet))
+	result, err = golzmq.ZmqRequest(zmqSock, strPacket)
+	expected = ""
+	golassert.AssertEqual(result, expected)
+	golassert.AssertEqual(err, nil)
+
+	_packet.DBAction = "read"
+	_packet.KeyList = []string{"an0n"}
+	strPacket = string(goshare_requestor.RequestPacketBytes(&_packet))
+	result, err = golzmq.ZmqRequest(zmqSock, strPacket)
+	expected = "an0n,ymous"
+	golassert.AssertEqual(result, expected)
+	golassert.AssertEqual(err, nil)
+
+	_packet.DBAction = "delete"
+	strPacket = string(goshare_requestor.RequestPacketBytes(&_packet))
+	result, err = golzmq.ZmqRequest(zmqSock, strPacket)
+	expected = ""
+	golassert.AssertEqual(result, expected)
+	golassert.AssertEqual(err, nil)
+
+	_packet.DBAction = "read"
+	strPacket = string(goshare_requestor.RequestPacketBytes(&_packet))
+	result, err = golzmq.ZmqRequest(zmqSock, strPacket)
+	expected = "Error for request sent: read default-default an0n"
 	golassert.AssertEqual(result, expected)
 	golassert.AssertEqual(err, nil)
 }

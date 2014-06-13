@@ -12,6 +12,8 @@
 
 [Tasks in Queue at Trello Board](https://trello.com/b/ZjDMRGQN/goshare)
 
+distributed under [MIT License](http://opensource.org/licenses/MIT)
+
 #### Go Share any data among the nodes. Over HTTP or ZeroMQ.
 
 * GOShare eases up communication over HTTP GET param based interaction.
