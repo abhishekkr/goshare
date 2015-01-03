@@ -35,6 +35,12 @@ func CreatePacket(packet_array []string) Packet {
 	packet := Packet{}
 	packet.HashMap = make(golhashmap.HashMap)
 
+	len_packet_array := len(packet_array)
+	if len_packet_array < 3 {
+		packet.DBAction = "ERROR"
+		return packet
+	}
+
 	packet.DBAction = packet_array[0]
 	packet.TaskType = packet_array[1]
 	data_starts_from := 2
@@ -42,6 +48,10 @@ func CreatePacket(packet_array []string) Packet {
 	task_type_tokens := strings.Split(packet.TaskType, "-")
 	packet.KeyType = task_type_tokens[0]
 	if packet.KeyType == "tsds" && packet.DBAction == "push" {
+		if len_packet_array < 9 {
+			packet.DBAction = "ERROR"
+			return packet
+		}
 		packet.TimeDot = goltime.CreateTimestamp(packet_array[2:8])
 		data_starts_from += 6
 	}
@@ -85,6 +95,9 @@ func decodeData(packet *Packet, message_array []string) {
 		if packet.ParentNS != "" {
 			PrefixKeyValParentNamespace(packet)
 		}
+
+	default:
+		packet.DBAction = "ERROR"
 	}
 }
 
