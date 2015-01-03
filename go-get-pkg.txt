@@ -1,4 +1,4 @@
--tags zmq_3_x github.com/alecthomas/gozmq
+-tags zmq_4_x github.com/alecthomas/gozmq
 github.com/abhishekkr/gol/golhashmap
 github.com/abhishekkr/gol/gollist
 github.com/abhishekkr/gol/goltime
