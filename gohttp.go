@@ -40,6 +40,7 @@ func DBRest(httpMethod string, w http.ResponseWriter, req *http.Request) {
 	packet := PacketFromHTTPRequest(dbAction, req)
 	if packet.DBAction != "" {
 		responseBytes, axnStatus = DBTasksOnPacket(packet)
+		DBRestResponse(w, req, responseBytes, axnStatus)
 	}
 }
 
