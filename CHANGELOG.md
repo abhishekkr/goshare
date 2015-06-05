@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.8.5
+
+* [db-tasks] moved to use golkeyval{,NS,TSDS} for switch-able db back-end
+* golint-ified goshare base code
+
+
 ### v0.8.4
 
 * [read,delete] enable {def,ns,tsds}-{,csv,json} to get multiple keys, this also define multi-val type for "read" output
