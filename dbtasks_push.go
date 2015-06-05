@@ -3,24 +3,23 @@ package goshare
 import (
 	"strings"
 
-	levigoNS "github.com/abhishekkr/levigoNS"
-	abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
-	levigoTSDS "github.com/abhishekkr/levigoTSDS"
+	golkeyvalNS "github.com/abhishekkr/gol/golkeyvalNS"
+	golkeyvalTSDS "github.com/abhishekkr/gol/golkeyvalTSDS"
 )
 
 /* Push a given set of Key-Val */
 func PushKeyVal(key string, val string) bool {
-	return abkleveldb.PushKeyVal(key, val, db)
+	return db.PushKeyVal(key, val)
 }
 
 /* Push a given Namespace-Key and its value */
 func PushKeyValNS(key string, val string) bool {
-	return levigoNS.PushNS(key, val, db)
+	return golkeyvalNS.PushNS(key, val, db)
 }
 
 /* Push a key namespace-d with current time */
 func PushKeyValNowTSDS(key string, val string) bool {
-	return levigoTSDS.PushNowTSDS(key, val, db)
+	return golkeyvalTSDS.PushNowTSDS(key, val, db)
 }
 
 /* Push a key namespace-d with goltime.Timestamp  */
@@ -29,7 +28,7 @@ func PushKeyValTSDS(packet Packet) bool {
 	_time := packet.TimeDot.Time()
 	for _key, _val := range packet.HashMap {
 		_val = strings.Replace(_val, "\n", " ", -1)
-		status = status && levigoTSDS.PushTSDS(_key, _val, _time, db)
+		status = status && golkeyvalTSDS.PushTSDS(_key, _val, _time, db)
 	}
 	return status
 }

@@ -1,24 +1,23 @@
 package goshare
 
 import (
-	levigoNS "github.com/abhishekkr/levigoNS"
-	abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
-	levigoTSDS "github.com/abhishekkr/levigoTSDS"
+	golkeyvalNS "github.com/abhishekkr/gol/golkeyvalNS"
+	golkeyvalTSDS "github.com/abhishekkr/gol/golkeyvalTSDS"
 )
 
 /* Empty Val for a given Key */
 func DelKey(key string) bool {
-	return abkleveldb.DelKey(key, db)
+	return db.DelKey(key)
 }
 
 /* Delete a Namespace Key and all its value */
 func DelKeyNS(key string) bool {
-	return levigoNS.DeleteNSRecursive(key, db)
+	return golkeyvalNS.DeleteNSRecursive(key, db)
 }
 
 /* Delete all keys under given namespace, same as NS */
 func DelKeyTSDS(key string) bool {
-	return levigoTSDS.DeleteTSDS(key, db)
+	return golkeyvalTSDS.DeleteTSDS(key, db)
 }
 
 /* Delete a key on task-type */

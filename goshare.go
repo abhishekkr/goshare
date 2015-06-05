@@ -9,18 +9,16 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jmhodges/levigo"
-
 	golerror "github.com/abhishekkr/gol/golerror"
+	golkeyval "github.com/abhishekkr/gol/golkeyval"
 	gollist "github.com/abhishekkr/gol/gollist"
-	abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
 )
 
 var (
-	db *levigo.DB
+	db golkeyval.DBEngine
 )
 
-/* just a banner print */
+/* banner just brand print */
 func banner() {
 	fmt.Println("**************************************************")
 	fmt.Println("  ___  ____      ___        __   _   __")
@@ -31,7 +29,7 @@ func banner() {
 	fmt.Println("**************************************************")
 }
 
-/* checking if you still wanna keep the goshare up */
+/* DoYouWannaContinue checking if you still wanna keep the goshare up */
 func DoYouWannaContinue() {
 	var input string
 	for {
@@ -45,15 +43,24 @@ func DoYouWannaContinue() {
 	}
 }
 
+/*goshareDB returns golkeyval DBEngine for it */
+func goshareDB(config Config) golkeyval.DBEngine {
+	db := golkeyval.GetDBEngine(config["DBEngine"])
+	db.Configure(config)
+	db.CreateDB()
+	return db
+}
+
 /*
-putting together base engine for GoShare
+GoShareEngine putting together base engine for GoShare as per config.
 dbpath, server_uri, httpport, rep_port, *string
 */
 func GoShareEngine(config Config) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// remember it will be same DB instance shared across goshare package
-	db = abkleveldb.CreateDB(config["dbpath"])
+	db = goshareDB(config)
+
 	if config["cpuprofile"] != "" {
 		f, err := os.Create(config["cpuprofile"])
 		if err != nil {
@@ -79,6 +86,7 @@ func GoShareEngine(config Config) {
 /* GoShare DB */
 func GoShare() {
 	banner()
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	GoShareEngine(ConfigFromFlags())
 	DoYouWannaContinue()
 }

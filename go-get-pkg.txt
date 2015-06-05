@@ -1,9 +1,10 @@
 -tags zmq_4_x github.com/alecthomas/gozmq
+github.com/abhishekkr/gol
+github.com/abhishekkr/gol/golkeyval
+github.com/abhishekkr/gol/golkeyvalNS
+github.com/abhishekkr/gol/golkeyvalTSDS
 github.com/abhishekkr/gol/golhashmap
 github.com/abhishekkr/gol/gollist
 github.com/abhishekkr/gol/goltime
 github.com/abhishekkr/gol/golzmq
-github.com/abhishekkr/gol
-github.com/abhishekkr/levigoNS
-github.com/abhishekkr/levigoTSDS
 github.com/abhishekkr/goshare

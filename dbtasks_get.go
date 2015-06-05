@@ -2,16 +2,15 @@ package goshare
 
 import (
 	golhashmap "github.com/abhishekkr/gol/golhashmap"
-	levigoNS "github.com/abhishekkr/levigoNS"
-	abkleveldb "github.com/abhishekkr/levigoNS/leveldb"
-	levigoTSDS "github.com/abhishekkr/levigoTSDS"
+	golkeyvalNS "github.com/abhishekkr/gol/golkeyvalNS"
+	golkeyvalTSDS "github.com/abhishekkr/gol/golkeyvalTSDS"
 )
 
 /* Get value of given key */
 func ReadKey(key string) golhashmap.HashMap {
 	var hashmap golhashmap.HashMap
 	hashmap = make(golhashmap.HashMap)
-	val := abkleveldb.GetVal(key, db)
+	val := db.GetVal(key)
 	if val == "" {
 		return hashmap
 	}
@@ -21,12 +20,12 @@ func ReadKey(key string) golhashmap.HashMap {
 
 /* Get value for all descendents of Namespace */
 func ReadKeyNS(key string) golhashmap.HashMap {
-	return levigoNS.ReadNSRecursive(key, db)
+	return golkeyvalNS.ReadNSRecursive(key, db)
 }
 
 /* Get value for the asked time-frame key, aah same NS */
 func ReadKeyTSDS(key string) golhashmap.HashMap {
-	return levigoTSDS.ReadTSDS(key, db)
+	return golkeyvalTSDS.ReadTSDS(key, db)
 }
 
 /* Delete a key on task-type */
