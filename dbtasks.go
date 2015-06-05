@@ -10,34 +10,40 @@ non-tsds {key&val, :type-data}
 tsds(-*) {tdot&key&val, tdot&:type-data}
 */
 
-/* Insulates communication from DBTasks
+/*
+DBTasks can be provided standard Packet Data Array from any communication Protocol.
 Communications handled on byte streams can use it by passing standard-ized packet-array
-it prepares Packet and passes on to TasksOnPacket, 0MQ utilizes it */
-func DBTasks(packet_array []string) ([]byte, bool) {
-	packet := CreatePacket(packet_array)
+It prepares Packet and passes on to TasksOnPacket.
+0MQ directly utilizes it.
+*/
+func DBTasks(packetArray []string) ([]byte, bool) {
+	packet := CreatePacket(packetArray)
 	return DBTasksOnPacket(packet)
 }
 
-/* Insulates communication from DBTasks
-Communication can directly create packet and pass it here, HTTP utilizes it directly */
+/*
+DBTasksOnPacket can utilize fromulated Packet.
+Communication can directly create packet and pass it here.
+HTTP directly utilizes it directly. 0MQ indirectly.
+*/
 func DBTasksOnPacket(packet Packet) ([]byte, bool) {
 	response := ""
-	axn_status := false
+	axnStatus := false
 
 	switch packet.DBAction {
 	case "read":
 		// returns axn error if key has empty value, if you gotta store then store, don't keep placeholders
 		response = ReadFromPacket(packet)
 		if response != "" {
-			axn_status = true
+			axnStatus = true
 		}
 
 	case "push":
-		axn_status = PushFromPacket(packet)
+		axnStatus = PushFromPacket(packet)
 
 	case "delete":
-		axn_status = DeleteFromPacket(packet)
+		axnStatus = DeleteFromPacket(packet)
 	}
 
-	return []byte(response), axn_status
+	return []byte(response), axnStatus
 }

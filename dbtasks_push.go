@@ -7,22 +7,30 @@ import (
 	golkeyvalTSDS "github.com/abhishekkr/gol/golkeyvalTSDS"
 )
 
-/* Push a given set of Key-Val */
+/*
+PushKeyVal pushes a given set of Key-Val.
+*/
 func PushKeyVal(key string, val string) bool {
 	return db.PushKeyVal(key, val)
 }
 
-/* Push a given Namespace-Key and its value */
+/*
+PushKeyValNS pushes a given Namespace-Key and its value.
+*/
 func PushKeyValNS(key string, val string) bool {
 	return golkeyvalNS.PushNS(key, val, db)
 }
 
-/* Push a key namespace-d with current time */
+/*
+PushKeyValNowTSDS pushes a key namespace-d with current time.
+*/
 func PushKeyValNowTSDS(key string, val string) bool {
 	return golkeyvalTSDS.PushNowTSDS(key, val, db)
 }
 
-/* Push a key namespace-d with goltime.Timestamp  */
+/*
+PushKeyValTSDS pushes a key namespace-d with goltime.Timestamp.
+*/
 func PushKeyValTSDS(packet Packet) bool {
 	status := true
 	_time := packet.TimeDot.Time()
@@ -33,9 +41,11 @@ func PushKeyValTSDS(packet Packet) bool {
 	return status
 }
 
-/* return func handle according to KeyType */
-func PushFuncByKeyType(key_type string) FunkAxnParamKeyVal {
-	switch key_type {
+/*
+PushFuncByKeyType returns func handle according to KeyType.
+*/
+func PushFuncByKeyType(keyType string) FunkAxnParamKeyVal {
+	switch keyType {
 	case "now":
 		return PushKeyValNowTSDS
 
@@ -48,7 +58,9 @@ func PushFuncByKeyType(key_type string) FunkAxnParamKeyVal {
 	}
 }
 
-/* handles multi-item */
+/*
+PushFromPacket handles push task based on provided Packet.
+*/
 func PushFromPacket(packet Packet) bool {
 	status := true
 	switch packet.KeyType {

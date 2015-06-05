@@ -9,7 +9,9 @@ import (
 	goltime "github.com/abhishekkr/gol/goltime"
 )
 
-/* structure for packet metadata */
+/*
+Packet for modelling data passed to GoShare into a structure of possible fields.
+*/
 type Packet struct {
 	DBAction string
 	TaskType string
@@ -24,74 +26,89 @@ type Packet struct {
 	TimeDot  goltime.Timestamp
 }
 
+/*
+FunkAxnParamKeyVal is a function type which get passed two string parameters
+and returns one boolean. Like Push Key-Val calls.
+*/
 type FunkAxnParamKeyVal func(key string, val string) bool
+
+/*
+FunkAxnParamKey is a function type which get passed one string parameter
+and returns one boolean. Like Del Key tasks.
+*/
 type FunkAxnParamKey func(key string) bool
+
+/*
+FunkAxnParamKeyReturnMap is a function type which get passed one string parameters
+and returns one hashmap. Like Get Key tasks.
+*/
 type FunkAxnParamKeyReturnMap func(key string) golhashmap.HashMap
 
 /*
-Create Packet from passed message array
+CreatePacket formulates Packet structure from passed message array.
 */
-func CreatePacket(packet_array []string) Packet {
+func CreatePacket(packetArray []string) Packet {
 	packet := Packet{}
 	packet.HashMap = make(golhashmap.HashMap)
 
-	len_packet_array := len(packet_array)
-	if len_packet_array < 3 {
+	lenPacketArray := len(packetArray)
+	if lenPacketArray < 3 {
 		packet.DBAction = "ERROR"
 		return packet
 	}
 
-	packet.DBAction = packet_array[0]
-	packet.TaskType = packet_array[1]
-	data_starts_from := 2
+	packet.DBAction = packetArray[0]
+	packet.TaskType = packetArray[1]
+	dataStartsFrom := 2
 
-	task_type_tokens := strings.Split(packet.TaskType, "-")
-	packet.KeyType = task_type_tokens[0]
+	taskTypeTokens := strings.Split(packet.TaskType, "-")
+	packet.KeyType = taskTypeTokens[0]
 	if packet.KeyType == "tsds" && packet.DBAction == "push" {
-		if len_packet_array < 9 {
+		if lenPacketArray < 9 {
 			packet.DBAction = "ERROR"
 			return packet
 		}
-		packet.TimeDot = goltime.CreateTimestamp(packet_array[2:8])
-		data_starts_from += 6
+		packet.TimeDot = goltime.CreateTimestamp(packetArray[2:8])
+		dataStartsFrom += 6
 	}
 
-	if len(task_type_tokens) > 1 {
-		packet.ValType = task_type_tokens[1]
+	if len(taskTypeTokens) > 1 {
+		packet.ValType = taskTypeTokens[1]
 
-		if len(task_type_tokens) == 3 {
+		if len(taskTypeTokens) == 3 {
 			// if packet requirement grows more than 3, that's the limit
 			// go get 'msgpack' to handle it instead...
-			thirdTokenFeature(&packet, packet_array, &data_starts_from, task_type_tokens[2])
+			thirdTokenFeature(&packet, packetArray, &dataStartsFrom, taskTypeTokens[2])
 		}
 	}
 
-	decodeData(&packet, packet_array[data_starts_from:])
+	decodeData(&packet, packetArray[dataStartsFrom:])
 	return packet
 }
 
-/* Special 3rd token feature */
-func thirdTokenFeature(packet *Packet, packet_array []string, data_starts_from *int, token string) {
+/* thirdTokenFeature handles special 3rd token feature, to populate Packet data. */
+func thirdTokenFeature(packet *Packet, packetArray []string, dataStartsFrom *int, token string) {
 	switch token {
 	case "parent":
-		packet.ParentNS = packet_array[*data_starts_from]
-		*data_starts_from += 1
+		packet.ParentNS = packetArray[*dataStartsFrom]
+		(*dataStartsFrom)++
 	}
 }
 
 /*
-Handles Packet formation: DBData calls according to Axn; handles TimeDot
+decodeData handles Packet formation based on DBAction.
+Handles TimeDot and pre-pending of ParentNS.
 */
-func decodeData(packet *Packet, message_array []string) {
+func decodeData(packet *Packet, messageArray []string) {
 	switch packet.DBAction {
 	case "read", "delete":
-		packet.KeyList = decodeKeyData(packet.ValType, message_array)
+		packet.KeyList = decodeKeyData(packet.ValType, messageArray)
 		if packet.ParentNS != "" {
 			PrefixKeyParentNamespace(packet)
 		}
 
 	case "push":
-		packet.HashMap = decodeKeyValData(packet.ValType, message_array)
+		packet.HashMap = decodeKeyValData(packet.ValType, messageArray)
 		if packet.ParentNS != "" {
 			PrefixKeyValParentNamespace(packet)
 		}
@@ -102,65 +119,67 @@ func decodeData(packet *Packet, message_array []string) {
 }
 
 /*
-Handles Packet formation: DBData based on ValType for GET|DELETE
+decodeKeyData handles Packet formation based on valType for GET, DELETE.
 */
-func decodeKeyData(valType string, message_array []string) []string {
+func decodeKeyData(valType string, messageArray []string) []string {
 	switch valType {
 	case "csv", "json":
-		multi_value := strings.Join(message_array, "\n")
+		multiValue := strings.Join(messageArray, "\n")
 		listEngine := gollist.GetListEngine(valType)
-		return listEngine.ToList(multi_value)
+		return listEngine.ToList(multiValue)
 
 	default:
-		return []string{message_array[0]}
+		return []string{messageArray[0]}
 	}
 }
 
 /*
-Handles Packet formation: DBData based on ValType for PUSH
+decodeKeyValData handles Packet formation based on valType for PUSH.
 */
-func decodeKeyValData(valType string, message_array []string) golhashmap.HashMap {
+func decodeKeyValData(valType string, messageArray []string) golhashmap.HashMap {
 	var hashmap golhashmap.HashMap
 	hashmap = make(golhashmap.HashMap)
 
 	switch valType {
 	case "csv", "json":
-		multi_value := strings.Join(message_array, "\n")
+		multiValue := strings.Join(messageArray, "\n")
 		hashmapEngine := golhashmap.GetHashMapEngine(valType)
-		hashmap = hashmapEngine.ToHashMap(multi_value)
+		hashmap = hashmapEngine.ToHashMap(multiValue)
 
 	default:
-		key := message_array[0]
-		value := strings.Join(message_array[1:], " ")
+		key := messageArray[0]
+		value := strings.Join(messageArray[1:], " ")
 		hashmap[key] = value
 	}
 	return hashmap
 }
 
 /*
-Prefixes Parent Namespaces to all keys in List if val for 'parent_namespace'
+PrefixKeyParentNamespace prefixes Parent Namespaces to all keys in List
+if val for 'parentNamespace'.
 */
 func PrefixKeyParentNamespace(packet *Packet) {
-	var new_list []string
-	new_list = make([]string, len(packet.KeyList))
+	var newList []string
+	newList = make([]string, len(packet.KeyList))
 
-	parent_namespace := packet.ParentNS
+	parentNamespace := packet.ParentNS
 	for idx, key := range packet.KeyList {
-		new_list[idx] = fmt.Sprintf("%s:%s", parent_namespace, key)
+		newList[idx] = fmt.Sprintf("%s:%s", parentNamespace, key)
 	}
-	packet.KeyList = new_list
+	packet.KeyList = newList
 }
 
 /*
-Prefixes Parent Namespaces to all key-val in HashMap if it has val for 'parent_namespace'
+PrefixKeyValParentNamespace prefixes Parent Namespaces to all key-val in HashMap
+if it has val for 'parentNamespace'.
 */
 func PrefixKeyValParentNamespace(packet *Packet) {
-	var new_hmap golhashmap.HashMap
-	new_hmap = make(golhashmap.HashMap)
+	var newHmap golhashmap.HashMap
+	newHmap = make(golhashmap.HashMap)
 
-	parent_namespace := packet.ParentNS
+	parentNamespace := packet.ParentNS
 	for key, val := range packet.HashMap {
-		new_hmap[fmt.Sprintf("%s:%s", parent_namespace, key)] = val
+		newHmap[fmt.Sprintf("%s:%s", parentNamespace, key)] = val
 	}
-	packet.HashMap = new_hmap
+	packet.HashMap = newHmap
 }
