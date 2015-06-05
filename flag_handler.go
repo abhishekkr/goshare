@@ -7,43 +7,48 @@ import (
 	"github.com/abhishekkr/gol/golconfig"
 )
 
+/*
+Config is a hashmap used here to carry around param=paramValue for GoShare.
+*/
 type Config map[string]string
 
 // flags
 var (
-	flag_config     = flag.String("config", "", "the path to overriding config file")
-	flag_dbengine   = flag.String("DBEngine", "leveldb", "the type of KeyVal DB backend to be used")
-	flag_dbpath     = flag.String("DBPath", "/tmp/GO.DB", "the path to DB")
-	flag_server_uri = flag.String("server-uri", "0.0.0.0", "what Port to Run HTTP Server at")
-	flag_http_port  = flag.String("http-port", "9999", "what Port to Run HTTP Server at")
-	flag_rep_ports  = flag.String("rep-ports", "9898,9797", "what PORT to run ZMQ REP at")
-	flag_cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
+	flagConfig     = flag.String("config", "", "the path to overriding config file")
+	flagDBEngine   = flag.String("DBEngine", "leveldb", "the type of KeyVal DB backend to be used")
+	flagDBPath     = flag.String("DBPath", "/tmp/GO.DB", "the path to DB")
+	flagServerUri  = flag.String("server-uri", "0.0.0.0", "what Port to Run HTTP Server at")
+	flagHTTPPort   = flag.String("http-port", "9999", "what Port to Run HTTP Server at")
+	flagRepPorts   = flag.String("rep-ports", "9898,9797", "what PORT to run ZMQ REP at")
+	flagCPUProfile = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
-/* assign val to *key only if it's empty */
+/* assignIfEmpty assigns val to *key only if it's empty */
 func assignIfEmpty(mapper Config, key string, val string) {
 	if mapper[key] == "" {
 		mapper[key] = val
 	}
 }
 
-/* config from flags */
+/*
+ConfigFromFlags configs from values provided to flags.
+*/
 func ConfigFromFlags() Config {
 	flag.Parse()
 
 	var config Config
 	config = make(Config)
-	if *flag_config != "" {
-		config_file := golconfig.GetConfig("json")
-		config_file.ConfigFromFile(*flag_config, &config)
+	if *flagConfig != "" {
+		configFile := golconfig.GetConfig("json")
+		configFile.ConfigFromFile(*flagConfig, &config)
 	}
 
-	assignIfEmpty(config, "DBEngine", *flag_dbengine)
-	assignIfEmpty(config, "DBPath", *flag_dbpath)
-	assignIfEmpty(config, "server-uri", *flag_server_uri)
-	assignIfEmpty(config, "http-port", *flag_http_port)
-	assignIfEmpty(config, "rep-ports", *flag_rep_ports)
-	assignIfEmpty(config, "cpuprofile", *flag_cpuprofile)
+	assignIfEmpty(config, "DBEngine", *flagDBEngine)
+	assignIfEmpty(config, "DBPath", *flagDBPath)
+	assignIfEmpty(config, "server-uri", *flagServerUri)
+	assignIfEmpty(config, "http-port", *flagHTTPPort)
+	assignIfEmpty(config, "rep-ports", *flagRepPorts)
+	assignIfEmpty(config, "cpuprofile", *flagCPUProfile)
 
 	fmt.Println("Starting for:", config)
 	return config

@@ -8,16 +8,18 @@ import (
 	"time"
 
 	golhashmap "github.com/abhishekkr/gol/golhashmap"
-	"github.com/abhishekkr/gol/goltime"
+	goltime "github.com/abhishekkr/gol/goltime"
 	"github.com/abhishekkr/goshare/httpd"
 )
 
-/* enabling HTTP to formulate DBTasks call from HTTP Request */
+/*
+DBRest enables HTTP to formulate DBTasks call from HTTP Request.
+*/
 func DBRest(httpMethod string, w http.ResponseWriter, req *http.Request) {
 	var (
-		dbAction       string
-		response_bytes []byte
-		axn_status     bool
+		dbAction      string
+		responseBytes []byte
+		axnStatus     bool
 	)
 
 	switch httpMethod {
@@ -37,27 +39,29 @@ func DBRest(httpMethod string, w http.ResponseWriter, req *http.Request) {
 
 	packet := PacketFromHTTPRequest(dbAction, req)
 	if packet.DBAction != "" {
-		response_bytes, axn_status = DBTasksOnPacket(packet)
+		responseBytes, axnStatus = DBTasksOnPacket(packet)
 	}
 }
 
-/* send proper response back to client based on success/data/error */
-func DBRestResponse(w http.ResponseWriter, req *http.Request, response_bytes []byte, axn_status bool) {
-	if !axn_status {
-		error_msg := fmt.Sprintf("FATAL Error: (DBTasks) %q", req.Form)
-		http.Error(w, error_msg, http.StatusInternalServerError)
+/*
+DBRestResponse sends proper response back to client based on success, data or error.
+*/
+func DBRestResponse(w http.ResponseWriter, req *http.Request, responseBytes []byte, axnStatus bool) {
+	if !axnStatus {
+		errorMsg := fmt.Sprintf("FATAL Error: (DBTasks) %q", req.Form)
+		http.Error(w, errorMsg, http.StatusInternalServerError)
 
-	} else if len(response_bytes) == 0 {
+	} else if len(responseBytes) == 0 {
 		w.Write([]byte("Success"))
 
 	} else {
-		w.Write(response_bytes)
+		w.Write(responseBytes)
 
 	}
 }
 
 /*
-return Packet identifiable by DBTasksOnAction
+PacketFromHTTPRequest return Packet identifiable by DBTasksOnAction.
 */
 func PacketFromHTTPRequest(dbAction string, req *http.Request) Packet {
 	packet := Packet{}
@@ -65,21 +69,21 @@ func PacketFromHTTPRequest(dbAction string, req *http.Request) Packet {
 	packet.DBAction = dbAction
 
 	req.ParseForm()
-	task_type := req.FormValue("type")
-	if task_type == "" {
-		task_type = "default"
+	taskType := req.FormValue("type")
+	if taskType == "" {
+		taskType = "default"
 	}
-	packet.TaskType = task_type
-	task_type_tokens := strings.Split(task_type, "-")
-	packet.KeyType = task_type_tokens[0]
+	packet.TaskType = taskType
+	taskTypeTokens := strings.Split(taskType, "-")
+	packet.KeyType = taskTypeTokens[0]
 	if packet.KeyType == "tsds" && packet.DBAction == "push" {
 		packet.TimeDot = goltime.TimestampFromHTTPRequest(req)
 	}
 
-	if len(task_type_tokens) > 1 {
-		packet.ValType = task_type_tokens[1]
+	if len(taskTypeTokens) > 1 {
+		packet.ValType = taskTypeTokens[1]
 
-		if len(task_type_tokens) == 3 {
+		if len(taskTypeTokens) == 3 {
 			thirdTokenFeatureHTTP(&packet, req)
 		}
 	}
@@ -96,7 +100,9 @@ func PacketFromHTTPRequest(dbAction string, req *http.Request) Packet {
 	return packet
 }
 
-/* third token handler in taskType */
+/*
+thirdTokenFeatureHTTP  handles third token in taskType.
+*/
 func thirdTokenFeatureHTTP(packet *Packet, req *http.Request) {
 	parentNS := req.FormValue("parentNS")
 	if parentNS != "" {
@@ -104,7 +110,9 @@ func thirdTokenFeatureHTTP(packet *Packet, req *http.Request) {
 	}
 }
 
-/* DB Call HTTP Handler */
+/*
+DBRestHandler handles DB Call for HTTP Request Method at '/db'.
+*/
 func DBRestHandler(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	req.ParseForm()
@@ -112,7 +120,9 @@ func DBRestHandler(w http.ResponseWriter, req *http.Request) {
 	DBRest(req.Method, w, req)
 }
 
-/* HTTP GET DB-GET call handler */
+/*
+GetReadKey HTTP GET DB-GET call handler at '/get'.
+*/
 func GetReadKey(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	req.ParseForm()
@@ -120,7 +130,9 @@ func GetReadKey(w http.ResponseWriter, req *http.Request) {
 	DBRest("GET", w, req)
 }
 
-/* HTTP GET DB-POST call handler */
+/*
+GetPushKey HTTP GET DB-POST call handler at '/put'.
+*/
 func GetPushKey(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	req.ParseForm()
@@ -128,7 +140,9 @@ func GetPushKey(w http.ResponseWriter, req *http.Request) {
 	DBRest("POST", w, req)
 }
 
-/* HTTP GET DB-POST call handler */
+/*
+GetDeleteKey HTTP GET DB-POST call handler at 'del'.
+*/
 func GetDeleteKey(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	req.ParseForm()
@@ -137,7 +151,8 @@ func GetDeleteKey(w http.ResponseWriter, req *http.Request) {
 }
 
 /*
-GoShare Handler for HTTP Requests
+GoShareHTTP handles all valid HTTP Requests for DBTasks, documentation
+and playground(WIP).
 */
 func GoShareHTTP(httpuri string, httpport int) {
 	runtime.GOMAXPROCS(runtime.NumCPU())

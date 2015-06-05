@@ -29,7 +29,9 @@ func banner() {
 	fmt.Println("**************************************************")
 }
 
-/* DoYouWannaContinue checking if you still wanna keep the goshare up */
+/*
+DoYouWannaContinue checking if you still wanna keep the goshare up.
+*/
 func DoYouWannaContinue() {
 	var input string
 	for {
@@ -43,7 +45,9 @@ func DoYouWannaContinue() {
 	}
 }
 
-/*goshareDB returns golkeyval DBEngine for it */
+/*
+goshareDB returns golkeyval DBEngine for it.
+*/
 func goshareDB(config Config) golkeyval.DBEngine {
 	db := golkeyval.GetDBEngine(config["DBEngine"])
 	db.Configure(config)
@@ -73,17 +77,19 @@ func GoShareEngine(config Config) {
 		}()
 	}
 
-	_http_port, err_http_port := strconv.Atoi(config["http-port"])
-	_reply_ports, err_reply_ports := gollist.CSVToNumbers(config["rep-ports"])
-	if err_http_port == nil && err_reply_ports == nil {
-		go GoShareHTTP(config["server-uri"], _http_port)
-		go GoShareZMQ(config["server-uri"], _reply_ports)
+	_httpPort, errHTTPPort := strconv.Atoi(config["http-port"])
+	_replyPorts, errReplyPorts := gollist.CSVToNumbers(config["rep-ports"])
+	if errHTTPPort == nil && errReplyPorts == nil {
+		go GoShareHTTP(config["server-uri"], _httpPort)
+		go GoShareZMQ(config["server-uri"], _replyPorts)
 	} else {
 		golerror.Boohoo("Port parameters to bind, error-ed while conversion to number.", true)
 	}
 }
 
-/* GoShare DB */
+/*
+GoShare is daddy-o of goshare instance.
+*/
 func GoShare() {
 	banner()
 	runtime.GOMAXPROCS(runtime.NumCPU())
