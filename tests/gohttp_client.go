@@ -187,6 +187,9 @@ func testNowKeyType() {
 	_, body = HttpGet(DelURL(*httphost, *httpport, "tsds", "myname"))
 	golassert.AssertEqual(body, "Success")
 
+	code, _ = HttpGet(GetURL(*httphost, *httpport, "tsds", "myname"))
+	golassert.AssertEqual(code, 500)
+
 	fmt.Println("No panic for 'timeseries now' key  type.")
 }
 
