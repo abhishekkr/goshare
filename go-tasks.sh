@@ -82,7 +82,7 @@ elif [[ "$1" == "bin" ]]; then
   cd ./bin
   for go_code_to_build in `ls ../zxtra/goshare_*.go`; do
     echo "Building: "$go_code_to_build
-    go build $go_code_to_build
+    go build -tags zmq_4_x $go_code_to_build
   done
 
 fi

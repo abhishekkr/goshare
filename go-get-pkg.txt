@@ -6,5 +6,6 @@ github.com/abhishekkr/gol/golkeyvalTSDS
 github.com/abhishekkr/gol/golhashmap
 github.com/abhishekkr/gol/gollist
 github.com/abhishekkr/gol/goltime
-github.com/abhishekkr/gol/golzmq
-github.com/abhishekkr/goshare
+-tags zmq_4_x github.com/abhishekkr/gol/golzmq
+-tags zmq_4_x github.com/abhishekkr/goshare
+github.com/VividCortex/godaemon
