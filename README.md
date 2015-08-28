@@ -47,14 +47,14 @@ Whereas *./bin/goshare_daemon* can be used as a system service daemon, with foll
 #### Tryout:
 
 ```Shell
- go run zxtra/goshare_daemon.go -dbpath=/tmp/GOTSDB
+ go run zxtra/goshare_daemon.go -DBPath=/tmp/GOTSDB
 ```
 
 By default it runs HTTP daemon at port 9999 and ZeroMQ daemon at 9797/9898,
 make it run on another port using following required flags
 
 ```Shell
- go run zxtra/goshare_daemon.go -dbpath=/tmp/GOTSDB -port=8080 -req-port=8000 -rep-port=8001
+ go run zxtra/goshare_daemon.go -DBPath=/tmp/GOTSDB -port=8080 -req-port=8000 -rep-port=8001
 ```
 
 ```ASCII
@@ -84,7 +84,8 @@ make it run on another port using following required flags
 >
 > * GoShare() : it runs HTTP and ZeroMQ daemon in parallel goroutines
 > > has optional flags customization of:
-> > * dbpath: path for LevelDB (default: /tmp/GO.DB)
+> > * DBPath: path for LevelDB or other used (default: /tmp/GO.DB)
+> > * DBEngine: DB backend used (default: leveldb,; other options: sqlite3)
 > > * port: port to bind HTTP daemon (default: 9999)
 > > * req-port, rep-port: ports to bind ZeroMQ REQ/REP daemon (default: 9797, 9898)
 >

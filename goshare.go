@@ -15,7 +15,8 @@ import (
 )
 
 var (
-	db golkeyval.DBEngine
+	db      golkeyval.DBEngine
+	logInfo Log
 )
 
 /* banner just brand print */
@@ -64,6 +65,8 @@ func GoShareEngine(config Config) {
 
 	// remember it will be same DB instance shared across goshare package
 	db = goshareDB(config)
+	logInfo = Log{Level: "info", Thread: make(chan string)}
+	go logInfo.LogIt()
 
 	if config["cpuprofile"] != "" {
 		f, err := os.Create(config["cpuprofile"])

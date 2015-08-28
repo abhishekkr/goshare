@@ -20,6 +20,9 @@ func goShareZmqRep(socket *zmq.Socket) {
 		messageArray := strings.Fields(string(msg))
 		responseBytes, axnStatus := DBTasks(messageArray)
 
+		logInfo.Thread <- fmt.Sprintf("Message Recieved: %s", string(msg))
+		logInfo.Thread <- fmt.Sprintf("ActionStatus: %v\nResponse: %s", axnStatus, string(responseBytes))
+		fmt.Printf(">> Message Recieved: %s\n", string(msg))
 		if axnStatus {
 			socket.Send([]byte(responseBytes), 0)
 		} else {
