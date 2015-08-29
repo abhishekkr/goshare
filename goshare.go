@@ -12,6 +12,7 @@ import (
 	golerror "github.com/abhishekkr/gol/golerror"
 	golkeyval "github.com/abhishekkr/gol/golkeyval"
 	gollist "github.com/abhishekkr/gol/gollist"
+	gollog "github.com/abhishekkr/gol/gollog"
 )
 
 var (
@@ -65,7 +66,7 @@ func GoShareEngine(config Config) {
 
 	// remember it will be same DB instance shared across goshare package
 	db = goshareDB(config)
-	logInfo = Log{Level: "info", Thread: make(chan string)}
+	logInfo = gollog.Log{Level: "info", Thread: make(chan string)}
 	go logInfo.LogIt()
 
 	if config["cpuprofile"] != "" {
