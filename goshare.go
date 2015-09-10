@@ -67,7 +67,7 @@ func GoShareEngine(config Config) {
 	// remember it will be same DB instance shared across goshare package
 	db = goshareDB(config)
 	logInfo = gollog.Log{Level: "info", Thread: make(chan string)}
-	go logInfo.LogIt()
+	go logInfo.Start()
 
 	if config["cpuprofile"] != "" {
 		f, err := os.Create(config["cpuprofile"])
