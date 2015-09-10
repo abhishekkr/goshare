@@ -17,7 +17,7 @@ import (
 
 var (
 	db      golkeyval.DBEngine
-	logInfo Log
+	logInfo gollog.Log
 )
 
 /* banner just brand print */
