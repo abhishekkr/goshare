@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	golconfig "github.com/abhishekkr/gol/golconfig"
 	golerror "github.com/abhishekkr/gol/golerror"
 	golkeyval "github.com/abhishekkr/gol/golkeyval"
 	gollist "github.com/abhishekkr/gol/gollist"
@@ -50,7 +51,7 @@ func DoYouWannaContinue() {
 /*
 goshareDB returns golkeyval DBEngine for it.
 */
-func goshareDB(config Config) golkeyval.DBEngine {
+func goshareDB(config golconfig.FlatConfig) golkeyval.DBEngine {
 	db := golkeyval.GetDBEngine(config["DBEngine"])
 	db.Configure(config)
 	db.CreateDB()
@@ -61,7 +62,7 @@ func goshareDB(config Config) golkeyval.DBEngine {
 GoShareEngine putting together base engine for GoShare as per config.
 dbpath, server_uri, httpport, rep_port, *string
 */
-func GoShareEngine(config Config) {
+func GoShareEngine(config golconfig.FlatConfig) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// remember it will be same DB instance shared across goshare package

@@ -7,11 +7,6 @@ import (
 	"github.com/abhishekkr/gol/golconfig"
 )
 
-/*
-Config is a hashmap used here to carry around param=paramValue for GoShare.
-*/
-type Config map[string]string
-
 // flags
 var (
 	flagConfig     = flag.String("config", "", "the path to overriding config file")
@@ -24,7 +19,7 @@ var (
 )
 
 /* assignIfEmpty assigns val to *key only if it's empty */
-func assignIfEmpty(mapper Config, key string, val string) {
+func assignIfEmpty(mapper golconfig.FlatConfig, key string, val string) {
 	if mapper[key] == "" {
 		mapper[key] = val
 	}
@@ -33,13 +28,13 @@ func assignIfEmpty(mapper Config, key string, val string) {
 /*
 ConfigFromFlags configs from values provided to flags.
 */
-func ConfigFromFlags() Config {
+func ConfigFromFlags() golconfig.FlatConfig {
 	flag.Parse()
 
-	var config Config
-	config = make(Config)
+	var config golconfig.FlatConfig
+	config = make(golconfig.FlatConfig)
 	if *flagConfig != "" {
-		configFile := golconfig.GetConfig("json")
+		configFile := golconfig.GetConfigurator("json")
 		configFile.ConfigFromFile(*flagConfig, &config)
 	}
 
