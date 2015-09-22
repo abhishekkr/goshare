@@ -47,7 +47,7 @@ func ConfigFromFlags() golconfig.FlatConfig {
 
 	fmt.Println("GoShare config:")
 	for cfg, val := range config {
-		fmt.Printf("[ %v : %v ]:", cfg, val)
+		fmt.Printf("[ %v : %v ]\n", cfg, val)
 	}
 	return config
 }
