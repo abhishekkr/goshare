@@ -45,6 +45,9 @@ func ConfigFromFlags() golconfig.FlatConfig {
 	assignIfEmpty(config, "rep-ports", *flagRepPorts)
 	assignIfEmpty(config, "cpuprofile", *flagCPUProfile)
 
-	fmt.Println("Starting for:", config)
+	fmt.Println("GoShare config:")
+	for cfg, val := range config {
+		fmt.Printf("[ %v : %v ]:", cfg, val)
+	}
 	return config
 }
