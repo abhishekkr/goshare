@@ -13,12 +13,10 @@ import (
 	golerror "github.com/abhishekkr/gol/golerror"
 	golkeyval "github.com/abhishekkr/gol/golkeyval"
 	gollist "github.com/abhishekkr/gol/gollist"
-	gollog "github.com/abhishekkr/gol/gollog"
 )
 
 var (
-	db      golkeyval.DBEngine
-	logInfo gollog.Log
+	db golkeyval.DBEngine
 )
 
 /* banner just brand print */
@@ -67,8 +65,6 @@ func GoShareEngine(config golconfig.FlatConfig) {
 
 	// remember it will be same DB instance shared across goshare package
 	db = goshareDB(config)
-	logInfo = gollog.Log{Level: "info", Thread: make(chan string)}
-	go logInfo.Start()
 
 	if config["cpuprofile"] != "" {
 		f, err := os.Create(config["cpuprofile"])
