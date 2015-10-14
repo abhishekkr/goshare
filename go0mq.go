@@ -20,7 +20,6 @@ func goShareZmqRep(socket *zmq.Socket) {
 		messageArray := strings.Fields(string(msg))
 		responseBytes, axnStatus := DBTasks(messageArray)
 
-		fmt.Printf(">> Message Recieved: %s\n", string(msg))
 		if axnStatus {
 			socket.Send([]byte(responseBytes), 0)
 		} else {
