@@ -98,14 +98,7 @@ go_get_pkg(){
 _OLD_PWD=$PWD
 cd $(dirname $0)
 
-if [[ $# -ne 1 ]]; then
-  echo "Use it wisely..."
-  echo "Build usable binaries: '$0 build'"
-  echo "Install tall Go lib dependencies: '$0 deps'"
-  echo "Run all Tests: '$0 test'"
-  exit 1
-
-elif [[ "$1" == "deps" ]]; then
+if [[ "$1" == "deps" ]]; then
   go_get_pkg
 
 elif [[ "$1" == "test" ]]; then
@@ -139,6 +132,12 @@ elif [[ "$1" == "build" ]]; then
     echo "Building: "$go_code_to_build
     go build -tags zmq_4_x $go_code_to_build
   done
+
+else
+  echo "Use it wisely..."
+  echo "Build usable binaries: '$0 build'"
+  echo "Install tall Go lib dependencies: '$0 deps'"
+  echo "Run all Tests: '$0 test'"
 
 fi
 
