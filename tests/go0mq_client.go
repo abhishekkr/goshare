@@ -25,6 +25,7 @@ var (
 // for key-type default
 func TestDefaultKeyType() {
 	result, err = golzmq.ZmqRequest(zmqSock, "push", "default", "myname", "anon")
+	fmt.Println(*request_port01)
 	expected = ""
 	golassert.AssertEqual(expected, result)
 	golassert.AssertEqual(err, nil)
