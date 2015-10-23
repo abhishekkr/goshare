@@ -1,31 +1,26 @@
 package goshare
 
-import (
-	"strings"
-
-	golkeyvalNS "github.com/abhishekkr/gol/golkeyvalNS"
-	golkeyvalTSDS "github.com/abhishekkr/gol/golkeyvalTSDS"
-)
+import "strings"
 
 /*
 PushKeyVal pushes a given set of Key-Val.
 */
 func PushKeyVal(key string, val string) bool {
-	return db.PushKeyVal(key, val)
+	return tsds.PushKeyVal(key, val)
 }
 
 /*
 PushKeyValNS pushes a given Namespace-Key and its value.
 */
 func PushKeyValNS(key string, val string) bool {
-	return golkeyvalNS.PushNS(key, val, db)
+	return tsds.PushNS(key, val)
 }
 
 /*
 PushKeyValNowTSDS pushes a key namespace-d with current time.
 */
 func PushKeyValNowTSDS(key string, val string) bool {
-	return golkeyvalTSDS.PushNowTSDS(key, val, db)
+	return tsds.PushNowTSDS(key, val)
 }
 
 /*
@@ -36,7 +31,7 @@ func PushKeyValTSDS(packet Packet) bool {
 	_time := packet.TimeDot.Time()
 	for _key, _val := range packet.HashMap {
 		_val = strings.Replace(_val, "\n", " ", -1)
-		status = status && golkeyvalTSDS.PushTSDS(_key, _val, _time, db)
+		status = status && tsds.PushTSDS(_key, _val, _time)
 	}
 	return status
 }

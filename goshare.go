@@ -11,12 +11,12 @@ import (
 
 	golconfig "github.com/abhishekkr/gol/golconfig"
 	golerror "github.com/abhishekkr/gol/golerror"
-	golkeyval "github.com/abhishekkr/gol/golkeyval"
+	golkeyvalTSDS "github.com/abhishekkr/gol/golkeyvalTSDS"
 	gollist "github.com/abhishekkr/gol/gollist"
 )
 
 var (
-	db golkeyval.DBEngine
+	tsds golkeyvalTSDS.TSDSDBEngine
 )
 
 /* banner just brand print */
@@ -49,11 +49,12 @@ func DoYouWannaContinue() {
 /*
 goshareDB returns golkeyval DBEngine for it.
 */
-func goshareDB(config golconfig.FlatConfig) golkeyval.DBEngine {
-	db := golkeyval.GetDBEngine(config["DBEngine"])
-	db.Configure(config)
-	db.CreateDB()
-	return db
+func goshareDB(config golconfig.FlatConfig) {
+	if config["TSEngine"] == "namespace" {
+		tsds = golkeyvalTSDS.GetNamespaceEngine(config)
+	} else {
+		panic("Unhandled TimeSeries Engine required.")
+	}
 }
 
 /*
@@ -64,7 +65,7 @@ func GoShareEngine(config golconfig.FlatConfig) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// remember it will be same DB instance shared across goshare package
-	db = goshareDB(config)
+	goshareDB(config)
 
 	if config["cpuprofile"] != "" {
 		f, err := os.Create(config["cpuprofile"])

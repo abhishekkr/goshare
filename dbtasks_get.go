@@ -1,10 +1,6 @@
 package goshare
 
-import (
-	golhashmap "github.com/abhishekkr/gol/golhashmap"
-	golkeyvalNS "github.com/abhishekkr/gol/golkeyvalNS"
-	golkeyvalTSDS "github.com/abhishekkr/gol/golkeyvalTSDS"
-)
+import golhashmap "github.com/abhishekkr/gol/golhashmap"
 
 /*
 ReadKey gets value of given key.
@@ -12,7 +8,7 @@ ReadKey gets value of given key.
 func ReadKey(key string) golhashmap.HashMap {
 	var hashmap golhashmap.HashMap
 	hashmap = make(golhashmap.HashMap)
-	val := db.GetVal(key)
+	val := tsds.GetVal(key)
 	if val == "" {
 		return hashmap
 	}
@@ -24,14 +20,14 @@ func ReadKey(key string) golhashmap.HashMap {
 ReadKeyNS gets value for all descendents of given key's namespace.
 */
 func ReadKeyNS(key string) golhashmap.HashMap {
-	return golkeyvalNS.ReadNSRecursive(key, db)
+	return tsds.ReadNSRecursive(key)
 }
 
 /*
 ReadKeyTSDS gets value for the asked time-frame key, aah same NS.
 */
 func ReadKeyTSDS(key string) golhashmap.HashMap {
-	return golkeyvalTSDS.ReadTSDS(key, db)
+	return tsds.ReadTSDS(key)
 }
 
 /*

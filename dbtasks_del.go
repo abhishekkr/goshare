@@ -1,22 +1,17 @@
 package goshare
 
-import (
-	golkeyvalNS "github.com/abhishekkr/gol/golkeyvalNS"
-	golkeyvalTSDS "github.com/abhishekkr/gol/golkeyvalTSDS"
-)
-
 /*
 DelKey deletes val for a given key, returns status.
 */
 func DelKey(key string) bool {
-	return db.DelKey(key)
+	return tsds.DelKey(key)
 }
 
 /*
 DelKeyNS deletes given key's namespace and all its values, returns status.
 */
 func DelKeyNS(key string) bool {
-	return golkeyvalNS.DeleteNSRecursive(key, db)
+	return tsds.DeleteNSRecursive(key)
 }
 
 /*
@@ -24,7 +19,7 @@ DelKeyTSDS deletes all keys under given namespace, same as NS.
 As here TimeSeries is a NameSpace
 */
 func DelKeyTSDS(key string) bool {
-	return golkeyvalTSDS.DeleteTSDS(key, db)
+	return tsds.DeleteTSDS(key)
 }
 
 /*

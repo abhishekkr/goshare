@@ -9,8 +9,12 @@ import (
 
 // flags
 var (
-	flagConfig     = flag.String("config", "", "the path to overriding config file")
-	flagDBEngine   = flag.String("DBEngine", "leveldb", "the type of KeyVal DB backend to be used")
+	flagConfig = flag.String("config", "", "the path to overriding config file")
+
+	flagDBEngine = flag.String("DBEngine", "leveldb", "the type of KeyVal DB backend to be used")
+	flagNSEngine = flag.String("NSEngine", "delimited", "the type of NameSpace DB backend to be used")
+	flagTSEngine = flag.String("TSEngine", "namespace", "the type of TimeSeries backend to be used")
+
 	flagDBPath     = flag.String("DBPath", "/tmp/GO.DB", "the path to DB")
 	flagServerUri  = flag.String("server-uri", "0.0.0.0", "what Port to Run HTTP Server at")
 	flagHTTPPort   = flag.String("http-port", "9999", "what Port to Run HTTP Server at")
@@ -39,6 +43,8 @@ func ConfigFromFlags() golconfig.FlatConfig {
 	}
 
 	assignIfEmpty(config, "DBEngine", *flagDBEngine)
+	assignIfEmpty(config, "NSEngine", *flagNSEngine)
+	assignIfEmpty(config, "TSEngine", *flagTSEngine)
 	assignIfEmpty(config, "DBPath", *flagDBPath)
 	assignIfEmpty(config, "server-uri", *flagServerUri)
 	assignIfEmpty(config, "http-port", *flagHTTPPort)
