@@ -118,17 +118,17 @@ func TestTSDSKeyType() {
 	golassert.AssertEqual(err, nil)
 
 	result, err = golzmq.ZmqRequest(zmqSock, "read", "ns", "myname")
-	expected = "myname:last:first:2014:February:10:9:8:7,anon"
+	expected = "myname:last:first:2014:2:10:9:8:7:0,anon"
 	golassert.AssertEqual(expected, result)
 	golassert.AssertEqual(err, nil)
 
 	result, err = golzmq.ZmqRequest(zmqSock, "read", "tsds", "myname")
-	expected = "myname:last:first:2014:February:10:9:8:7,anon"
+	expected = "myname:last:first:2014:2:10:9:8:7:0,anon"
 	golassert.AssertEqual(expected, result)
 	golassert.AssertEqual(err, nil)
 
 	result, err = golzmq.ZmqRequest(zmqSock, "read", "tsds", "myname:last:first")
-	expected = "myname:last:first:2014:February:10:9:8:7,anon"
+	expected = "myname:last:first:2014:2:10:9:8:7:0,anon"
 	golassert.AssertEqual(expected, result)
 	golassert.AssertEqual(err, nil)
 
@@ -139,8 +139,8 @@ func TestTSDSKeyType() {
 
 	result, err = golzmq.ZmqRequest(zmqSock, "read", "tsds", "myname")
 	result_arr := strings.Split(result, "\n")
-	expected_arr := []string{"myname:last:first:2014:February:10:9:8:7,anon",
-		"myname:2014:February:10:9:18:37,anonymous"}
+	expected_arr := []string{"myname:last:first:2014:2:10:9:8:7:0,anon",
+		"myname:2014:2:10:9:18:37:0,anonymous"}
 	golassert.AssertEqualStringArray(expected_arr, result_arr)
 	golassert.AssertEqual(err, nil)
 
@@ -149,10 +149,15 @@ func TestTSDSKeyType() {
 	golassert.AssertEqual(expected, result)
 	golassert.AssertEqual(err, nil)
 
+	result, err = golzmq.ZmqRequest(zmqSock, "push", "tsds-csv", "2014", "2", "10", "9", "18", "37.0", "myname,bob\nmyemail,bob@b.com")
+	expected = ""
+	golassert.AssertEqual(expected, result)
+	golassert.AssertEqual(err, nil)
+
 	result, err = golzmq.ZmqRequest(zmqSock, "read", "tsds", "myname")
 	result_arr = strings.Split(result, "\n")
-	expected_arr = []string{"myname:last:first:2014:February:10:9:8:7,anon",
-		"myname:2014:February:10:9:18:37,bob"}
+	expected_arr = []string{"myname:last:first:2014:2:10:9:8:7:0,anon",
+		"myname:2014:2:10:9:18:37:0,bob"}
 	golassert.AssertEqualStringArray(expected_arr, result_arr)
 	golassert.AssertEqual(err, nil)
 
@@ -162,17 +167,17 @@ func TestTSDSKeyType() {
 	golassert.AssertEqual(err, nil)
 
 	result, err = golzmq.ZmqRequest(zmqSock, "read", "tsds", "myemail")
-	expected = "myemail:2014:February:10:9:18:37,bob@b.com"
+	expected = "myemail:2014:2:10:9:18:37:0,bob@b.com"
 	golassert.AssertEqual(expected, result)
 	golassert.AssertEqual(err, nil)
 
 	result, err = golzmq.ZmqRequest(zmqSock, "read", "tsds", "mytxt")
-	expected = "mytxt:2014:February:10:9:18:37,\"my email, bob@b.com\""
+	expected = "mytxt:2014:2:10:9:18:37:0,\"my email, bob@b.com\""
 	golassert.AssertEqual(expected, result)
 	golassert.AssertEqual(err, nil)
 
-	result, err = golzmq.ZmqRequest(zmqSock, "read", "tsds", "myname:2014:February:10")
-	expected = "myname:2014:February:10:9:18:37,alice"
+	result, err = golzmq.ZmqRequest(zmqSock, "read", "tsds", "myname:2014:2:10")
+	expected = "myname:2014:2:10:9:18:37:0,alice"
 	golassert.AssertEqual(expected, result)
 	golassert.AssertEqual(err, nil)
 
@@ -257,7 +262,7 @@ func TestParentNSValType() {
 	golassert.AssertEqual(err, nil)
 
 	result, err = golzmq.ZmqRequest(zmqSock, "read", "tsds-default-parent", "people", "myname")
-	expected = "people:myname,anonymous\npeople:myname:2014:February:10:9:18:37,bob"
+	expected = "people:myname,anonymous\npeople:myname:2014:2:10:9:18:37:0,bob"
 	golassert.AssertEqual(expected, result)
 	golassert.AssertEqual(err, nil)
 

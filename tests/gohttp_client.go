@@ -132,19 +132,19 @@ func testTSDSKeyType() {
 	golassert.AssertEqual(body, "Success")
 
 	_, body = HttpGet(GetURL(*httphost, *httpport, "tsds", "myname:last"))
-	golassert.AssertEqual(body, "myname:last:2014:February:10:1:1:1,ymous")
+	golassert.AssertEqual(body, "myname:last:2014:2:10:1:1:1:0,ymous")
 
 	_, body = HttpGet(GetURL(*httphost, *httpport, "tsds", "myname"))
 	strings3 := strings.Split(body, "\n")
-	strings3_expected := []string{"myname:last:2014:February:10:1:1:1,ymous",
-		"myname:2014:February:10:9:8:7,anonymous",
-		"myname:2014:February:10:0:1:7,untitled"}
+	strings3_expected := []string{"myname:last:2014:2:10:1:1:1:0,ymous",
+		"myname:2014:2:10:9:8:7:0,anonymous",
+		"myname:2014:2:10:0:1:7:0,untitled"}
 	golassert.AssertEqualStringArray(strings3, strings3_expected)
 
-	_, body = HttpGet(GetURL(*httphost, *httpport, "tsds", "myname:2014:February:10"))
+	_, body = HttpGet(GetURL(*httphost, *httpport, "tsds", "myname:2014:2:10"))
 	strings2 := strings.Split(body, "\n")
-	strings2_expected := []string{"myname:2014:February:10:9:8:7,anonymous",
-		"myname:2014:February:10:0:1:7,untitled"}
+	strings2_expected := []string{"myname:2014:2:10:9:8:7:0,anonymous",
+		"myname:2014:2:10:0:1:7:0,untitled"}
 	golassert.AssertEqualStringArray(strings2, strings2_expected)
 
 	_, body = HttpGet(DelURL(*httphost, *httpport, "tsds", "myname"))
@@ -198,8 +198,8 @@ func testForCSV() {
 	_, body := HttpGet(MultiTSDSPutURL(*httphost, *httpport, "csv", "yourname:last:first,trudy", "2014", "2", "10", "1", "1", "1"))
 	golassert.AssertEqual(body, "Success")
 
-	_, body = HttpGet(GetURL(*httphost, *httpport, "tsds", "yourname:last:first:2014:February"))
-	golassert.AssertEqual(body, "yourname:last:first:2014:February:10:1:1:1,trudy")
+	_, body = HttpGet(GetURL(*httphost, *httpport, "tsds", "yourname:last:first:2014:2"))
+	golassert.AssertEqual(body, "yourname:last:first:2014:2:10:1:1:1:0,trudy")
 
 	_, body = HttpGet(DelURL(*httphost, *httpport, "tsds", "yourname"))
 	golassert.AssertEqual(body, "Success")

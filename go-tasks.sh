@@ -101,6 +101,9 @@ cd $(dirname $0)
 if [[ "$1" == "deps" ]]; then
   go_get_pkg
 
+elif [[ "$1" == "gorun" ]]; then
+  go run -tags zmq_4_x "$2"
+
 elif [[ "$1" == "test" ]]; then
   $0 build
   echo
