@@ -28,10 +28,9 @@ PushKeyValTSDS pushes a key namespace-d with goltime.Timestamp.
 */
 func PushKeyValTSDS(packet Packet) bool {
 	status := true
-	_time := packet.TimeDot.Time()
 	for _key, _val := range packet.HashMap {
 		_val = strings.Replace(_val, "\n", " ", -1)
-		status = status && tsds.PushTSDS(_key, _val, _time)
+		status = status && tsds.PushTSDS(_key, _val, packet.TimeDot)
 	}
 	return status
 }
